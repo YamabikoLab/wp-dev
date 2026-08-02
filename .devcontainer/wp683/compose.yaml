@@ -1,5 +1,5 @@
 include:
   - path: ../../docker/compose.shared.yaml
     env_file:
-      - ../../environments/.env
+      - ../../environments/default.env
       - ../../environments/wp683.env
