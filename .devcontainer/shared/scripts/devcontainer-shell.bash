@@ -4,7 +4,13 @@ __DEVCONTAINER_SHELL_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 __DEVCONTAINER_DEFAULT_WORKSPACE_DIR="$(cd -- "${__DEVCONTAINER_SHELL_DIR}/.." && pwd)"
 
 devcontainer_workspace_dir() {
-    printf '%s' "${DEVCONTAINER_WORKSPACE_DIR:-${__DEVCONTAINER_DEFAULT_WORKSPACE_DIR}}"
+    if [[ -n "${DEVCONTAINER_WORKSPACE_DIR:-}" ]]; then
+        printf '%s' "${DEVCONTAINER_WORKSPACE_DIR}"
+    elif [[ -n "${WORKSPACE_NAME:-}" ]]; then
+        printf '/workspaces/%s' "${WORKSPACE_NAME}"
+    else
+        printf '%s' "${__DEVCONTAINER_DEFAULT_WORKSPACE_DIR}"
+    fi
 }
 
 devcontainer_prompt_dir() {
