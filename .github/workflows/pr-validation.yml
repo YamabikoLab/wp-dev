@@ -24,34 +24,20 @@ jobs:
           echo "::error::Select the PR branch when running this workflow."
           exit 1
 
-      - name: Prepare Docker Compose validation environment
+      - name: Prepare Docker Compose validation environments
         run: |
           mkdir -p .ci-project
 
-          cat > environments/default.env <<'EOF'
-          ENVIRONMENT_NAME=default
-          COMPOSE_PROJECT_NAME=wp-dev-ci-default
-          WORDPRESS_IMAGE_TAG=7.0.2-php8.3-apache
-          WORDPRESS_PORT=8080
-          WORDPRESS_SITE_URL=http://127.0.0.1:8080
-          MAILPIT_WEB_PORT=8025
-          EDITOR_MODE=default
-          WORDPRESS_DB_NAME=wordpress
-          WORDPRESS_DB_USER=wordpress
-          WORDPRESS_DB_PASSWORD=wordpress
-          WORDPRESS_DB_ROOT_PASSWORD=wordpress-root
-          WORDPRESS_ADMIN_USER=admin
-          WORDPRESS_ADMIN_PASSWORD=admin
-          WORDPRESS_ADMIN_EMAIL=admin@example.test
-          LOCAL_UID=1000
-          LOCAL_GID=1000
-          TZ=Asia/Tokyo
-          LOCALE=ja_JP.UTF-8
-          WP_PROJECT_DIRECTORY=plugins
-          WP_PROJECT_SLUG=example-plugin
-          WP_PROJECT_SOURCE_PATH=../../.ci-project
-          WORKSPACE_NAME=example-plugin
-          EOF
+          for environment in default wp683; do
+            cp "environments/${environment}.env.example" "environments/${environment}.env"
+            sed -i \
+              -e 's#<your-project-name>#wp-dev-ci#g' \
+              -e 's#<plugins|themes>#plugins#g' \
+              -e 's#<your-plugin-slug-name|your-theme-slug-name>#example-plugin#g' \
+              -e 's#../../<your-project-source-path>#../../.ci-project#g' \
+              -e 's#<your-repository-name>#example-plugin#g' \
+              "environments/${environment}.env"
+          done
 
       - name: Validate default Docker Compose configuration
         run: docker compose -f .devcontainer/default/compose.yaml config --quiet
