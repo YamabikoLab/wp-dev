@@ -2,16 +2,20 @@
 
 This directory contains the project-specific values used by each Dev Container configuration.
 
-The default Dev Container loads `environments/default.env`. This repository tracks `environments/default.env.example` as the template, while the local `default.env` file must not be committed.
+Each Dev Container loads its matching local environment file:
 
-The `wp683` Dev Container loads `environments/default.env` first and then applies the committed `environments/wp683.env` overrides.
+- `default` loads `environments/default.env`.
+- `wp683` loads `environments/wp683.env`.
 
-## Create the local environment file
+The repository tracks matching `.env.example` templates, while local `.env` files must not be committed.
 
-Copy the template before opening the Dev Container:
+## Create a local environment file
+
+Copy the template for the environment you want to use:
 
 ```bash
 cp environments/default.env.example environments/default.env
+cp environments/wp683.env.example environments/wp683.env
 ```
 
 Update at least the following values for the WordPress project being developed:
@@ -29,19 +33,17 @@ Update at least the following values for the WordPress project being developed:
 
 The Dev Container opens `/workspaces` as its workspace. Use `cdw` to move to the project directory selected by `WORKSPACE_NAME`.
 
-The database and WordPress administrator credentials in `default.env.example` are local-development defaults only. Replace them when necessary, and never store real credentials in the repository.
+The database and WordPress administrator credentials in the templates are local-development defaults only. Replace them when necessary, and never store real credentials in the repository.
 
-Do not add `wp683.env.example`. The committed `wp683.env` contains only the WordPress 6.8.3-specific overrides and reuses project settings from `default.env`.
+Future WordPress environments should follow the same naming pair: `wp***.env.example` for the committed template and `wp***.env` for the ignored local file.
 
 ## Validate the configuration
-
-Run Docker Compose configuration validation after editing `default.env`:
 
 ```bash
 docker compose -f .devcontainer/default/compose.yaml config
 docker compose -f .devcontainer/wp683/compose.yaml config
 ```
 
-Then open the repository in Visual Studio Code and select the `default` or `wp683` Dev Container configuration.
+Then open the repository in Visual Studio Code and select the matching Dev Container configuration.
 
 The Compose service definitions remain in `docker/compose.shared.yaml`. Do not copy them into the environment file or the Dev Container-specific Compose file.
