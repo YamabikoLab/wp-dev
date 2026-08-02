@@ -85,6 +85,9 @@ RUN case "${LOCALE}" in \
     && printf '%s UTF-8\n' "${LOCALE}" > /etc/locale.gen \
     && locale-gen
 
+COPY docker/wordpress/mu-plugins \
+    /usr/src/wordpress/wp-content/mu-plugins
+
 RUN npm install --global "@openai/codex@${CODEX_CLI_VERSION}" \
     && codex --version > /dev/null
 

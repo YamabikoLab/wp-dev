@@ -46,12 +46,8 @@ cdw() {
     cd "$(devcontainer_workspace_dir)"
 }
 
-cdwpdev() {
+cde() {
     cd "${__WP_DEV_WORKSPACE_DIR}"
-}
-
-cdapp() {
-    cd "$(devcontainer_workspace_dir)/app"
 }
 
 cdwp() {

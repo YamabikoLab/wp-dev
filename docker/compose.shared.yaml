@@ -56,13 +56,6 @@ services:
           create_host_path: false
 
       - type: bind
-        source: ../docker/wordpress/mu-plugins
-        target: /var/www/html/wp-content/mu-plugins
-        read_only: true
-        bind:
-          create_host_path: false
-
-      - type: bind
         source: ../docker/mail/msmtprc
         target: /etc/msmtprc
         read_only: true
