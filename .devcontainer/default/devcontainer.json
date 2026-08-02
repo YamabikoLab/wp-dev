@@ -3,7 +3,7 @@
   "dockerComposeFile": "compose.yaml",
   "service": "wordpress",
   "runServices": ["db", "wordpress"],
-  "workspaceFolder": "/workspaces/${localEnv:WORKSPACE_NAME}",
+  "workspaceFolder": "/workspaces",
   "shutdownAction": "none",
   "overrideCommand": false,
   "waitFor": "postCreateCommand",
