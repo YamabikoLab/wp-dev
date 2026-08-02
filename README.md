@@ -24,14 +24,16 @@ projects/
 
 ### 2. 環境設定ファイルを作成する
 
-サンプルをコピーします。
+使用する環境のサンプルをコピーします。
 
 ```bash
 cd wp-dev
 cp environments/default.env.example environments/default.env
+# WordPress 6.8.3を使用する場合
+cp environments/wp683.env.example environments/wp683.env
 ```
 
-`environments/default.env`を開き、開発対象に合わせて次の項目を変更します。
+作成した環境設定ファイルを開き、開発対象に合わせて次の項目を変更します。
 
 ```dotenv
 COMPOSE_PROJECT_NAME=your-project-default
@@ -68,7 +70,12 @@ Visual Studio Codeで`wp-dev`を開き、コマンドパレットから次を実
 Dev Containers: Reopen in Container
 ```
 
-複数のDev Container構成が表示された場合は、`default`を選択します。
+複数のDev Container構成が表示された場合は、次のいずれかを選択します。
+
+- `default`: `environments/default.env`を使用
+- `wp683`: `environments/wp683.env`を使用
+
+`wp683`のサンプル設定ではWordPressを`http://127.0.0.1:8081`、Mailpitを`http://127.0.0.1:8026`で公開します。
 
 コンテナの作成時に、`wp-dev`内の初期化スクリプトが自動的に実行されます。
 
@@ -90,13 +97,27 @@ WordPressから送信されたメールは外部へ配送されず、Mailpitに�
 http://127.0.0.1:8025
 ```
 
-Web UIのポートを変更する場合は、`environments/default.env`の`MAILPIT_WEB_PORT`を変更してください。
+Web UIのポートを変更する場合は、使用する環境設定ファイルの`MAILPIT_WEB_PORT`を変更してください。
 
 開発環境では、WordPressのメール送信元が次の値に統一されます。
 
 ```text
 送信元アドレス: wordpress@example.test
 送信者名: WordPress Development
+```
+
+## 構成の検証
+
+```bash
+docker compose -f .devcontainer/default/compose.yaml config --quiet
+docker compose -f .devcontainer/wp683/compose.yaml config --quiet
+```
+
+`wp683`のコンテナ内では、次のコマンドでバージョンを確認できます。
+
+```bash
+wp core version
+php --version
 ```
 
 ## マウント先
@@ -118,7 +139,7 @@ Web UIのポートを変更する場合は、`environments/default.env`の`MAILP
 
 ## 初期ログイン情報
 
-初期値は次のとおりです。必要に応じて`environments/default.env`で変更してください。
+初期値は次のとおりです。必要に応じて使用する環境設定ファイルで変更してください。
 
 ```text
 ユーザー名: admin
@@ -143,7 +164,7 @@ Web UIのポートを変更する場合は、`environments/default.env`の`MAILP
 
 Dev Containerを閉じても、`shutdownAction`の設定によりコンテナは自動停止しません。
 
-停止する場合は、`wp-dev`ディレクトリで次を実行します。
+`default`を停止する場合は、`wp-dev`ディレクトリで次を実行します。
 
 ```bash
 docker compose \
@@ -152,11 +173,13 @@ docker compose \
   down
 ```
 
-ボリュームも削除して初期化する場合は、`--volumes`を追加します。
+`wp683`を停止する場合は、次を実行します。
 
 ```bash
 docker compose \
-  --env-file environments/default.env \
-  -f .devcontainer/default/compose.yaml \
-  down --volumes
+  --env-file environments/wp683.env \
+  -f .devcontainer/wp683/compose.yaml \
+  down
 ```
+
+ボリュームも削除して初期化する場合は、対象コマンドに`--volumes`を追加します。
