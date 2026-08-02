@@ -1,9 +1,9 @@
 {
-  "name": "Yamabiko Editor Tools: default",
+  "name": "wp-dev: default",
   "dockerComposeFile": "compose.yaml",
   "service": "wordpress",
   "runServices": ["db", "wordpress"],
-  "workspaceFolder": "/workspaces/yamabiko-editor-tools",
+  "workspaceFolder": "/workspaces/${containerEnv:WORKSPACE_NAME}",
   "shutdownAction": "none",
   "overrideCommand": false,
   "customizations": {
