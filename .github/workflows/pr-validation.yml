@@ -1,0 +1,46 @@
+name: PR Validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repository:
+    name: Repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require a PR branch
+        if: github.ref_name == github.event.repository.default_branch
+        run: |
+          echo "::error::Select the PR branch when running this workflow."
+          exit 1
+
+      - name: Prepare Docker Compose validation environment
+        run: |
+          mkdir -p .ci-project
+
+          cat > environments/.env <<'EOF'
+          COMPOSE_PROJECT_NAME=wp-dev-ci
+          WORDPRESS_IMAGE_TAG=7.0.2-php8.3-apache
+          WORDPRESS_PORT=8080
+          WORDPRESS_SITE_URL=http://127.0.0.1:8080
+          WP_PROJECT_DIRECTORY=plugins
+          WP_PROJECT_SLUG=example-plugin
+          WP_PROJECT_SOURCE_PATH=../../.ci-project
+          WORKSPACE_NAME=example-plugin
+          EOF
+
+      - name: Validate Docker Compose configuration
+        run: docker compose -f .devcontainer/default/compose.yaml config --quiet
+
+      - name: Check whitespace errors
+        run: git diff --check origin/main...HEAD
