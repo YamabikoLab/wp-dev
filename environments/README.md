@@ -1,20 +1,42 @@
-# Environment definitions
+# Environment configuration
 
-Each `*.env` file defines one isolated WordPress environment. The file name without `.env` must match `ENVIRONMENT_NAME`.
+This directory contains the project-specific values used by the default Dev Container configuration.
 
-To add an environment:
+`.devcontainer/default/compose.yaml` loads `environments/.env`, while this repository tracks `environments/.env.example` as the template. The local `.env` file must not be committed.
 
-1. Copy `.env.example` to a new descriptive name.
-2. Change `ENVIRONMENT_NAME` and `COMPOSE_PROJECT_NAME` to unique values.
-3. Select an unused `WORDPRESS_PORT` and update `WORDPRESS_SITE_URL` to match.
-4. Set the required WordPress image tag and any environment-specific values.
-5. Add `.devcontainer/<environment-name>/devcontainer.json`.
-6. Add `.devcontainer/<environment-name>/compose.yaml` that includes the shared Compose file with this environment's `env_file`.
-7. Run `docker compose -f .devcontainer/<environment-name>/compose.yaml config` to validate the definition.
-8. Use `Dev Containers: Reopen in Container` or `Dev Containers: Switch Container` in VS Code.
+## Create the local environment file
 
-The per-environment Dev Container files are thin standard configuration entries. Do not copy service definitions into them.
+Copy the template before opening the Dev Container:
 
-No changes to the shared Compose template, Dockerfile, or plugin source are required when adding an environment.
+```bash
+cp environments/.env.example environments/.env
+```
 
-Do not commit real credentials. The credentials in the baseline definition are local-development defaults only.
+Update at least the following values for the WordPress project being developed:
+
+| Variable | Purpose |
+| --- | --- |
+| `COMPOSE_PROJECT_NAME` | Unique Docker Compose project name used to isolate containers, networks, and volumes. |
+| `WORDPRESS_IMAGE_TAG` | WordPress image tag used to build the development container. |
+| `WORDPRESS_PORT` | Host port used to access WordPress. |
+| `WORDPRESS_SITE_URL` | WordPress URL. Keep its port aligned with `WORDPRESS_PORT`. |
+| `WP_PROJECT_DIRECTORY` | WordPress project type: `plugins` or `themes`. |
+| `WP_PROJECT_SLUG` | Directory name used under `wp-content/plugins` or `wp-content/themes`. |
+| `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and the workspace. |
+| `WORKSPACE_NAME` | Directory name used for the project under `/workspaces`. |
+
+`WORKSPACE_NAME` must stay aligned with `workspaceFolder` in `.devcontainer/default/devcontainer.json`.
+
+The database and WordPress administrator credentials in `.env.example` are local-development defaults only. Replace them when necessary, and never store real credentials in the repository.
+
+## Validate the configuration
+
+Run Docker Compose configuration validation after editing `.env`:
+
+```bash
+docker compose -f .devcontainer/default/compose.yaml config
+```
+
+Then open the repository in Visual Studio Code and select the `default` Dev Container configuration.
+
+The Compose service definitions remain in `docker/compose.shared.yaml`. Do not copy them into the environment file or the Dev Container-specific Compose file.
