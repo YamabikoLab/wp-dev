@@ -14,6 +14,7 @@ services:
     environment:
       TZ: ${TZ:-Asia/Tokyo}
       LANG: ${LOCALE:-ja_JP.UTF-8}
+      WORKSPACE_NAME: ${WORKSPACE_NAME:?WORKSPACE_NAME is required}
       WORDPRESS_SITE_URL: ${WORDPRESS_SITE_URL:?WORDPRESS_SITE_URL is required}
       WORDPRESS_DEBUG: "1"
 
@@ -37,14 +38,20 @@ services:
         target: /var/www/html
 
       - type: bind
-        source: ../app
-        target: /var/www/html/wp-content/plugins/yamabiko-editor-tools
+        source: ${WP_PROJECT_SOURCE_PATH:?WP_PROJECT_SOURCE_PATH is required}
+        target: /var/www/html/wp-content/${WP_PROJECT_DIRECTORY}/${WP_PROJECT_SLUG}
+        bind:
+          create_host_path: false
+
+      - type: bind
+        source: ${WP_PROJECT_SOURCE_PATH:?WP_PROJECT_SOURCE_PATH is required}
+        target: /workspaces/${WORKSPACE_NAME}
         bind:
           create_host_path: false
 
       - type: bind
         source: ..
-        target: /workspaces/yamabiko-editor-tools
+        target: /workspaces/wp-dev
         bind:
           create_host_path: false
 

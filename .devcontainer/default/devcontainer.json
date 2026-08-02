@@ -1,9 +1,9 @@
 {
-  "name": "Yamabiko Editor Tools: wp702-default",
+  "name": "wp-dev: default",
   "dockerComposeFile": "compose.yaml",
   "service": "wordpress",
   "runServices": ["db", "wordpress"],
-  "workspaceFolder": "/workspaces/yamabiko-editor-tools",
+  "workspaceFolder": "/workspaces/${containerEnv:WORKSPACE_NAME}",
   "shutdownAction": "none",
   "overrideCommand": false,
   "customizations": {
@@ -60,6 +60,6 @@
       }
     }
   },
-  "postCreateCommand": "bash .devcontainer/shared/scripts/ai-tool-data.sh --restore && bash .devcontainer/shared/scripts/shell-setup.sh",
+  "postCreateCommand": "bash /workspaces/wp-dev/.devcontainer/shared/scripts/ai-tool-data.sh --restore && bash /workspaces/wp-dev/.devcontainer/shared/scripts/shell-setup.sh",
   "remoteUser": "www-data"
 }
