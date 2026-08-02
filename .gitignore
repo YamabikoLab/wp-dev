@@ -2,7 +2,8 @@
 .env.*
 !.env.example
 environments/*.env
-!environments/*.env.example
+!environments/default.env
+!environments/wp683.env
 
 .devcontainer/shared/scripts/ai-tool-data-backup.tar.gz
 .devcontainer/shared/scripts/.ai-tool-data-backup.tar.gz.tmp.*
