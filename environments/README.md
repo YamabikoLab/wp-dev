@@ -4,7 +4,7 @@ Each `*.env` file defines one isolated WordPress environment. The file name with
 
 To add an environment:
 
-1. Copy `wp702-default.env` to a new descriptive name.
+1. Copy `.env.example` to a new descriptive name.
 2. Change `ENVIRONMENT_NAME` and `COMPOSE_PROJECT_NAME` to unique values.
 3. Select an unused `WORDPRESS_PORT` and update `WORDPRESS_SITE_URL` to match.
 4. Set the required WordPress image tag and any environment-specific values.
