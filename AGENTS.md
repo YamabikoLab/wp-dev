@@ -9,7 +9,7 @@ These instructions apply to the entire repository.
 - `docker/compose.shared.yaml` is the shared Compose service definition and the source of truth for services, volumes, and mount behavior.
 - `.devcontainer/<environment-name>/` contains thin Dev Container entry points. Do not duplicate shared service definitions there.
 - `.devcontainer/shared/` contains shared Docker, PHP, and initialization resources used by all environments.
-- `environments/.env.example` documents the committed environment-variable template. `environments/.env` is local configuration and must not be committed.
+- `environments/default.env.example` documents the committed environment-variable template. `environments/default.env` is local configuration and must not be committed.
 - Read `README.md` before changing setup, mounting, startup, shutdown, or usage behavior.
 - Read `environments/README.md` before adding or changing environment definitions.
 
@@ -50,7 +50,7 @@ These instructions apply to the entire repository.
 - Run only checks applicable to the changed files.
 - For Compose, Dev Container, Docker, or environment-definition changes, validate the effective configuration with the active local environment file:
 
-  `docker compose --env-file environments/.env -f .devcontainer/default/compose.yaml config --quiet`
+  `docker compose --env-file environments/default.env -f .devcontainer/default/compose.yaml config --quiet`
 
 - When adding another environment, validate that environment's Compose entry point instead of assuming the default environment covers it.
 - Run `git diff --check` for repository changes before handoff.
