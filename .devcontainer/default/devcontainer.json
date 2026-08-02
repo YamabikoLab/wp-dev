@@ -1,5 +1,5 @@
 {
-  "name": "Yamabiko Editor Tools: wp702-default",
+  "name": "Yamabiko Editor Tools: default",
   "dockerComposeFile": "compose.yaml",
   "service": "wordpress",
   "runServices": ["db", "wordpress"],
