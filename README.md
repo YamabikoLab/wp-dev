@@ -2,7 +2,7 @@
 
 WordPressプラグイン・テーマ開発用の共通Dev Container環境です。
 
-開発対象のリポジトリを外部からマウントし、WordPress、MariaDB、PHP、WP-CLI、Mailpitを含む開発環境を提供します。
+開発対象のリポジトリを外部からマウントし、WordPress、MariaDB、PHP、WP-CLIなどを含む開発環境を提供します。開発環境と製品コードを分離できるため、複数のWordPressプロジェクトで同じ環境を再利用できます。
 
 ## 必要なもの
 
@@ -14,7 +14,7 @@ WordPressプラグイン・テーマ開発用の共通Dev Container環境です�
 
 ### 1. リポジトリを配置する
 
-`wp-dev`と開発対象のリポジトリを、相対パスで参照できる場所へ配置します。
+`wp-dev`と開発対象のリポジトリを、同じ親ディレクトリなど相対パスで参照できる場所へ配置します。
 
 ```text
 projects/
@@ -22,35 +22,32 @@ projects/
 └── your-wordpress-project/
 ```
 
-### 2. 共通設定ファイルを作成する
+### 2. 環境設定ファイルを作成する
+
+サンプルをコピーします。
 
 ```bash
 cd wp-dev
-cp environments/.env.example environments/.env
+cp environments/default.env.example environments/default.env
 ```
 
-`environments/.env`を開き、開発対象に合わせて変更します。
+`environments/default.env`を開き、開発対象に合わせて次の項目を変更します。
 
 ```dotenv
-PROJECT_NAME=your-project
+COMPOSE_PROJECT_NAME=your-project-default
 WP_PROJECT_DIRECTORY=plugins
 WP_PROJECT_SLUG=your-plugin-slug
 WP_PROJECT_SOURCE_PATH=../../your-wordpress-project
 WORKSPACE_NAME=your-wordpress-project
 ```
 
-テーマを開発する場合は、`WP_PROJECT_DIRECTORY=themes`にします。
+テーマを開発する場合は、`WP_PROJECT_DIRECTORY`を`themes`にします。
 
-環境固有のWordPressバージョン、ポート、Composeプロジェクト名は、コミット済みのプリセットで管理します。
+```dotenv
+WP_PROJECT_DIRECTORY=themes
+```
 
-| 構成 | WordPress | WordPress URL | Mailpit URL |
-| --- | --- | --- | --- |
-| `default` | 7.0.2 / PHP 8.3 / Apache | `http://127.0.0.1:8080` | `http://127.0.0.1:8025` |
-| `wp683` | 6.8.3 / PHP 8.3 / Apache | `http://127.0.0.1:8081` | `http://127.0.0.1:8026` |
-
-`PROJECT_NAME`には、それぞれ自動的に`-default`または`-wp683`が付きます。そのため、両環境を同時に起動してもコンテナ、ネットワーク、ボリュームが競合しません。
-
-### 3. Dev Containerを選択する
+### 3. Dev Containerを開く
 
 Visual Studio Codeで`wp-dev`を開き、コマンドパレットから次を実行します。
 
@@ -58,30 +55,35 @@ Visual Studio Codeで`wp-dev`を開き、コマンドパレットから次を実
 Dev Containers: Reopen in Container
 ```
 
-表示された構成から、用途に応じて次のいずれかを選択します。
+次のいずれかを選択します。
 
-- `wp-dev: default`
-- `wp-dev: wp683`
+- `wp-dev: default`: `environments/default.env`をそのまま使用
+- `wp-dev: wp683`: `environments/default.env`を基礎に、WordPress 6.8.3用の設定を上書き
 
-開発対象のリポジトリは、次の2箇所へマウントされます。
+`wp683`では次の設定が使用されます。
+
+| 項目 | 値 |
+| --- | --- |
+| WordPressイメージ | `wordpress:6.8.3-php8.3-apache` |
+| WordPress URL | `http://127.0.0.1:8081` |
+| Mailpit URL | `http://127.0.0.1:8026` |
+| Composeプロジェクト名 | `wp-dev-wp683` |
+
+開発対象のリポジトリは、どちらの環境でも同じ方法でマウントされます。
 
 ```text
 /var/www/html/wp-content/<plugins|themes>/<slug>
 /workspaces/<workspace-name>
 ```
 
-`wp-dev`自体は`/workspaces/wp-dev`へマウントされます。`cdw`で開発対象のワークスペースへ移動できます。
-
 ## 構成の検証
-
-共通設定ファイルを作成した後、次のコマンドで両構成を検証できます。
 
 ```bash
 docker compose -f .devcontainer/default/compose.yaml config --quiet
 docker compose -f .devcontainer/wp683/compose.yaml config --quiet
 ```
 
-実行中のWordPressバージョンは、コンテナ内で次のように確認できます。
+`wp683`のコンテナ内では、次のコマンドでバージョンを確認できます。
 
 ```bash
 wp core version
@@ -93,34 +95,18 @@ php --version
 `default`を停止します。
 
 ```bash
-docker compose -f .devcontainer/default/compose.yaml down
+docker compose \
+  --env-file environments/default.env \
+  -f .devcontainer/default/compose.yaml \
+  down
 ```
 
 `wp683`を停止します。
 
 ```bash
-docker compose -f .devcontainer/wp683/compose.yaml down
+docker compose \
+  -f .devcontainer/wp683/compose.yaml \
+  down
 ```
 
-ボリュームも削除して初期化する場合のみ、対象コマンドに`--volumes`を追加してください。
-
-## 初期ログイン情報
-
-初期値は`environments/.env`で変更できます。
-
-```text
-ユーザー名: admin
-パスワード: admin
-メールアドレス: admin@example.test
-```
-
-これらはローカル開発専用です。本番環境では使用しないでください。
-
-## データの永続化
-
-次のデータは環境ごとのDockerボリュームへ保存されます。
-
-- WordPress本体とアップロードデータ
-- MariaDBのデータ
-- Codexの設定データ
-- GitHub CLIの設定データ
+ボリュームも削除して初期化する場合は、対象コマンドに`--volumes`を追加してください。
