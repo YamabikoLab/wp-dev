@@ -6,6 +6,7 @@
   "workspaceFolder": "/workspaces/${localEnv:WORKSPACE_NAME}",
   "shutdownAction": "none",
   "overrideCommand": false,
+  "waitFor": "postCreateCommand",
   "customizations": {
     "vscode": {
       "extensions": [
