@@ -47,6 +47,19 @@ WORKSPACE_NAME=your-wordpress-project
 WP_PROJECT_DIRECTORY=themes
 ```
 
+主な設定項目は次のとおりです。
+
+| 項目                     | 説明                                                        |
+| ------------------------ | ----------------------------------------------------------- |
+| `COMPOSE_PROJECT_NAME`   | Docker Composeプロジェクト名                                |
+| `WORDPRESS_IMAGE_TAG`    | 使用するWordPress Dockerイメージのタグ                      |
+| `WORDPRESS_PORT`         | ホスト側で公開するWordPressのポート                         |
+| `MAILPIT_WEB_PORT`       | MailpitのWeb UIを公開するホスト側ポート                     |
+| `WP_PROJECT_DIRECTORY`   | `plugins`または`themes`                                     |
+| `WP_PROJECT_SLUG`        | WordPress内で使用するプラグインまたはテーマのディレクトリ名 |
+| `WP_PROJECT_SOURCE_PATH` | 開発対象リポジトリへの相対パス                              |
+| `WORKSPACE_NAME`         | Dev Container内のワークスペース名                           |
+
 ### 3. Dev Containerを開く
 
 Visual Studio Codeで`wp-dev`を開き、コマンドパレットから次を実行します。
@@ -55,25 +68,40 @@ Visual Studio Codeで`wp-dev`を開き、コマンドパレットから次を実
 Dev Containers: Reopen in Container
 ```
 
-次のいずれかを選択します。
+複数のDev Container構成が表示された場合は、次のいずれかを選択します。
 
-- `wp-dev: default`: `environments/default.env`をそのまま使用
-- `wp-dev: wp683`: `environments/default.env`を基礎に、WordPress 6.8.3用の設定を上書き
+- `default`: `environments/default.env`を使用
+- `wp683`: `environments/default.env`を基礎に、`environments/wp683.env`のWordPress 6.8.3用設定を上書き
 
-`wp683`では次の設定が使用されます。
+`wp683`ではWordPressを`http://127.0.0.1:8081`、Mailpitを`http://127.0.0.1:8026`で公開します。
 
-| 項目 | 値 |
-| --- | --- |
-| WordPressイメージ | `wordpress:6.8.3-php8.3-apache` |
-| WordPress URL | `http://127.0.0.1:8081` |
-| Mailpit URL | `http://127.0.0.1:8026` |
-| Composeプロジェクト名 | `wp-dev-wp683` |
+コンテナの作成時に、`wp-dev`内の初期化スクリプトが自動的に実行されます。
 
-開発対象のリポジトリは、どちらの環境でも同じ方法でマウントされます。
+### 4. WordPressへアクセスする
+
+初期設定では、次のURLからアクセスできます。
 
 ```text
-/var/www/html/wp-content/<plugins|themes>/<slug>
-/workspaces/<workspace-name>
+http://127.0.0.1:8080
+```
+
+ポートを変更した場合は、`WORDPRESS_SITE_URL`も同じ値に合わせてください。
+
+### 5. 送信メールを確認する
+
+WordPressから送信されたメールは外部へ配送されず、Mailpitに保存されます。初期設定では、次のURLから確認できます。
+
+```text
+http://127.0.0.1:8025
+```
+
+Web UIのポートを変更する場合は、`environments/default.env`の`MAILPIT_WEB_PORT`を変更してください。
+
+開発環境では、WordPressのメール送信元が次の値に統一されます。
+
+```text
+送信元アドレス: wordpress@example.test
+送信者名: WordPress Development
 ```
 
 ## 構成の検証
@@ -90,9 +118,51 @@ wp core version
 php --version
 ```
 
+## マウント先
+
+開発対象のリポジトリは、コンテナ内の次の2箇所へマウントされます。
+
+```text
+/var/www/html/wp-content/<plugins|themes>/<slug>
+/workspaces/<workspace-name>
+```
+
+1つ目はWordPressから読み込むためのパス、2つ目はVisual Studio Codeで編集するためのワークスペースです。
+
+`wp-dev`自体は次の場所へマウントされます。
+
+```text
+/workspaces/wp-dev
+```
+
+## 初期ログイン情報
+
+初期値は次のとおりです。必要に応じて`environments/default.env`で変更してください。
+
+```text
+ユーザー名: admin
+パスワード: admin
+メールアドレス: admin@example.test
+```
+
+これらはローカル開発専用です。本番環境では使用しないでください。
+
+## データの永続化
+
+次のデータはDockerボリュームへ保存されます。
+
+- WordPress本体とアップロードデータ
+- MariaDBのデータ
+- Codexの設定データ
+- GitHub CLIの設定データ
+
+環境を完全に初期化する場合は、対象のComposeプロジェクトに紐づくボリュームも削除してください。
+
 ## 環境の停止
 
-`default`を停止します。
+Dev Containerを閉じても、`shutdownAction`の設定によりコンテナは自動停止しません。
+
+`default`を停止する場合は、`wp-dev`ディレクトリで次を実行します。
 
 ```bash
 docker compose \
@@ -101,7 +171,7 @@ docker compose \
   down
 ```
 
-`wp683`を停止します。
+`wp683`を停止する場合は、次を実行します。
 
 ```bash
 docker compose \
@@ -109,4 +179,4 @@ docker compose \
   down
 ```
 
-ボリュームも削除して初期化する場合は、対象コマンドに`--volumes`を追加してください。
+ボリュームも削除して初期化する場合は、対象コマンドに`--volumes`を追加します。
