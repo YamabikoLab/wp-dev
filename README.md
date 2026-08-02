@@ -4,6 +4,9 @@ WordPressプラグイン・テーマ開発用の共通Dev Container環境です�
 
 開発対象のリポジトリを外部からマウントし、WordPress、MariaDB、PHP、WP-CLIなどを含む開発環境を提供します。開発環境と製品コードを分離できるため、複数のWordPressプロジェクトで同じ環境を再利用できます。
 
+<img width="1448" height="1086" alt="wp-dev-overview" src="https://github.com/user-attachments/assets/2a422f72-5d27-4883-9441-0ba5b6e32510" />
+
+
 ## 必要なもの
 
 - Docker
