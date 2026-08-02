@@ -1,7 +1,7 @@
 # Dev container shell customization
 
 __DEVCONTAINER_SHELL_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-__DEVCONTAINER_DEFAULT_WORKSPACE_DIR="$(cd -- "${__DEVCONTAINER_SHELL_DIR}/.." && pwd)"
+__WP_DEV_WORKSPACE_DIR="$(cd -- "${__DEVCONTAINER_SHELL_DIR}/../.." && pwd)"
 
 devcontainer_workspace_dir() {
     if [[ -n "${DEVCONTAINER_WORKSPACE_DIR:-}" ]]; then
@@ -9,7 +9,7 @@ devcontainer_workspace_dir() {
     elif [[ -n "${WORKSPACE_NAME:-}" ]]; then
         printf '/workspaces/%s' "${WORKSPACE_NAME}"
     else
-        printf '%s' "${__DEVCONTAINER_DEFAULT_WORKSPACE_DIR}"
+        printf '%s' "${__WP_DEV_WORKSPACE_DIR}"
     fi
 }
 
@@ -44,6 +44,10 @@ alias ..='cd ..'
 
 cdw() {
     cd "$(devcontainer_workspace_dir)"
+}
+
+cdwpdev() {
+    cd "${__WP_DEV_WORKSPACE_DIR}"
 }
 
 cdapp() {
