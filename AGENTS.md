@@ -6,7 +6,7 @@ These instructions apply to the entire repository.
 
 - This repository provides a reusable local WordPress development environment for externally mounted plugin and theme repositories.
 - Keep product source code out of this repository. Plugin and theme code belongs in the repository referenced by `WP_PROJECT_SOURCE_PATH`.
-- `docker/compose.environment.yaml` is the shared Compose service definition and the source of truth for services, volumes, and mount behavior.
+- `docker/compose.shared.yaml` is the shared Compose service definition and the source of truth for services, volumes, and mount behavior.
 - `.devcontainer/<environment-name>/` contains thin Dev Container entry points. Do not duplicate shared service definitions there.
 - `.devcontainer/shared/` contains shared Docker, PHP, and initialization resources used by all environments.
 - `environments/.env.example` documents the committed environment-variable template. `environments/.env` is local configuration and must not be committed.
