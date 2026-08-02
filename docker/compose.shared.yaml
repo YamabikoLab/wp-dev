@@ -14,6 +14,7 @@ services:
     environment:
       TZ: ${TZ:-Asia/Tokyo}
       LANG: ${LOCALE:-ja_JP.UTF-8}
+      WORKSPACE_NAME: ${WORKSPACE_NAME:?WORKSPACE_NAME is required}
       WORDPRESS_SITE_URL: ${WORDPRESS_SITE_URL:?WORDPRESS_SITE_URL is required}
       WORDPRESS_DEBUG: "1"
 
