@@ -56,6 +56,13 @@ services:
           create_host_path: false
 
       - type: bind
+        source: ../docker/mail/msmtprc
+        target: /etc/msmtprc
+        read_only: true
+        bind:
+          create_host_path: false
+
+      - type: bind
         source: ../.devcontainer/shared/php/xdebug.ini
         target: /usr/local/etc/php/conf.d/99-xdebug.ini
         read_only: true
@@ -79,6 +86,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mailpit:
+        condition: service_started
 
   db:
     image: mariadb:12.3
@@ -99,6 +108,13 @@ services:
       timeout: 5s
       retries: 20
       start_period: 10s
+
+  mailpit:
+    image: axllent/mailpit:latest
+    environment:
+      TZ: ${TZ:-Asia/Tokyo}
+    ports:
+      - "127.0.0.1:${MAILPIT_WEB_PORT:-8025}:8025"
 
 volumes:
   wordpress_data:

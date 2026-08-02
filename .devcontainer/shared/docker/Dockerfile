@@ -50,6 +50,8 @@ RUN set -eux; \
         less \
         locales \
         mariadb-client \
+        msmtp \
+        msmtp-mta \
         unzip \
         xz-utils; \
     architecture="${TARGETARCH:-$(dpkg --print-architecture)}"; \
@@ -77,11 +79,14 @@ RUN set -eux; \
 
 RUN case "${LOCALE}" in \
         ""|*[![:alnum:]_.@-]*) \
-            printf '%s\n' "Invalid LOCALE: ${LOCALE}" >&2; \
-            exit 1 ;; \
+        printf '%s\n' "Invalid LOCALE: ${LOCALE}" >&2; \
+        exit 1 ;; \
     esac \
     && printf '%s UTF-8\n' "${LOCALE}" > /etc/locale.gen \
     && locale-gen
+
+COPY docker/wordpress/mu-plugins \
+    /usr/src/wordpress/wp-content/mu-plugins
 
 RUN npm install --global "@openai/codex@${CODEX_CLI_VERSION}" \
     && codex --version > /dev/null

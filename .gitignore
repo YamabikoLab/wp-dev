@@ -1,6 +1,8 @@
 .env
 .env.*
 !.env.example
+environments/*.env
+!environments/*.env.example
 
 .devcontainer/shared/scripts/ai-tool-data-backup.tar.gz
 .devcontainer/shared/scripts/.ai-tool-data-backup.tar.gz.tmp.*

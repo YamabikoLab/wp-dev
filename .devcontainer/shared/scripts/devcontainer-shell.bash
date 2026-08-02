@@ -1,23 +1,15 @@
 # Dev container shell customization
 
 __DEVCONTAINER_SHELL_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-__DEVCONTAINER_DEFAULT_WORKSPACE_DIR="$(cd -- "${__DEVCONTAINER_SHELL_DIR}/.." && pwd)"
+__WP_DEV_WORKSPACE_DIR="$(cd -- "${__DEVCONTAINER_SHELL_DIR}/../.." && pwd)"
 
 devcontainer_workspace_dir() {
-    printf '%s' "${DEVCONTAINER_WORKSPACE_DIR:-${__DEVCONTAINER_DEFAULT_WORKSPACE_DIR}}"
-}
-
-devcontainer_prompt_dir() {
-    local workspace_dir
-    workspace_dir="$(devcontainer_workspace_dir)"
-    local current_dir="${PWD}"
-
-    if [[ "${current_dir}" == "${workspace_dir}" ]]; then
-        printf '~'
-    elif [[ "${current_dir}" == "${workspace_dir}/"* ]]; then
-        printf '~/%s' "${current_dir#"${workspace_dir}/"}"
+    if [[ -n "${DEVCONTAINER_WORKSPACE_DIR:-}" ]]; then
+        printf '%s' "${DEVCONTAINER_WORKSPACE_DIR}"
+    elif [[ -n "${WORKSPACE_NAME:-}" ]]; then
+        printf '/workspaces/%s' "${WORKSPACE_NAME}"
     else
-        printf '%s' "${current_dir}"
+        printf '%s' "${__WP_DEV_WORKSPACE_DIR}"
     fi
 }
 
@@ -40,8 +32,8 @@ cdw() {
     cd "$(devcontainer_workspace_dir)"
 }
 
-cdapp() {
-    cd "$(devcontainer_workspace_dir)/app"
+cde() {
+    cd "${__WP_DEV_WORKSPACE_DIR}"
 }
 
 cdwp() {
@@ -59,8 +51,6 @@ cdthemes() {
 cduploads() {
     cd /var/www/html/wp-content/uploads
 }
-
-PS1='\u@\h:$(devcontainer_prompt_dir)\$ '
 
 # VS Code統合ターミナルのTTYをCodexフック用に記録する
 if [[ $- == *i* ]] && tty -s; then

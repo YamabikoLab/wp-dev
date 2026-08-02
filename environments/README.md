@@ -1,15 +1,15 @@
 # Environment configuration
 
-This directory contains the project-specific values used by the default Dev Container configuration.
+This directory contains the project-specific values used by each Dev Container configuration.
 
-`.devcontainer/default/compose.yaml` loads `environments/.env`, while this repository tracks `environments/.env.example` as the template. The local `.env` file must not be committed.
+The default Dev Container loads `environments/default.env`. This repository tracks `environments/default.env.example` as the template, while the local `default.env` file must not be committed.
 
 ## Create the local environment file
 
 Copy the template before opening the Dev Container:
 
 ```bash
-cp environments/.env.example environments/.env
+cp environments/default.env.example environments/default.env
 ```
 
 Update at least the following values for the WordPress project being developed:
@@ -25,13 +25,13 @@ Update at least the following values for the WordPress project being developed:
 | `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and the workspace. |
 | `WORKSPACE_NAME` | Directory name used for the project under `/workspaces`. |
 
-`WORKSPACE_NAME` must stay aligned with `workspaceFolder` in `.devcontainer/default/devcontainer.json`.
+The Dev Container opens `/workspaces` as its workspace. Use `cdw` to move to the project directory selected by `WORKSPACE_NAME`.
 
-The database and WordPress administrator credentials in `.env.example` are local-development defaults only. Replace them when necessary, and never store real credentials in the repository.
+The database and WordPress administrator credentials in `default.env.example` are local-development defaults only. Replace them when necessary, and never store real credentials in the repository.
 
 ## Validate the configuration
 
-Run Docker Compose configuration validation after editing `.env`:
+Run Docker Compose configuration validation after editing `default.env`:
 
 ```bash
 docker compose -f .devcontainer/default/compose.yaml config

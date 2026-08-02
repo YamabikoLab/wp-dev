@@ -28,10 +28,10 @@ projects/
 
 ```bash
 cd wp-dev
-cp environments/.env.example environments/.env
+cp environments/default.env.example environments/default.env
 ```
 
-`environments/.env`を開き、開発対象に合わせて次の項目を変更します。
+`environments/default.env`を開き、開発対象に合わせて次の項目を変更します。
 
 ```dotenv
 COMPOSE_PROJECT_NAME=your-project-default
@@ -49,15 +49,16 @@ WP_PROJECT_DIRECTORY=themes
 
 主な設定項目は次のとおりです。
 
-| 項目 | 説明 |
-| --- | --- |
-| `COMPOSE_PROJECT_NAME` | Docker Composeプロジェクト名 |
-| `WORDPRESS_IMAGE_TAG` | 使用するWordPress Dockerイメージのタグ |
-| `WORDPRESS_PORT` | ホスト側で公開するWordPressのポート |
-| `WP_PROJECT_DIRECTORY` | `plugins`または`themes` |
-| `WP_PROJECT_SLUG` | WordPress内で使用するプラグインまたはテーマのディレクトリ名 |
-| `WP_PROJECT_SOURCE_PATH` | 開発対象リポジトリへの相対パス |
-| `WORKSPACE_NAME` | Dev Container内のワークスペース名 |
+| 項目                     | 説明                                                        |
+| ------------------------ | ----------------------------------------------------------- |
+| `COMPOSE_PROJECT_NAME`   | Docker Composeプロジェクト名                                |
+| `WORDPRESS_IMAGE_TAG`    | 使用するWordPress Dockerイメージのタグ                      |
+| `WORDPRESS_PORT`         | ホスト側で公開するWordPressのポート                         |
+| `MAILPIT_WEB_PORT`       | MailpitのWeb UIを公開するホスト側ポート                     |
+| `WP_PROJECT_DIRECTORY`   | `plugins`または`themes`                                     |
+| `WP_PROJECT_SLUG`        | WordPress内で使用するプラグインまたはテーマのディレクトリ名 |
+| `WP_PROJECT_SOURCE_PATH` | 開発対象リポジトリへの相対パス                              |
+| `WORKSPACE_NAME`         | Dev Container内のワークスペース名                           |
 
 ### 3. Dev Containerを開く
 
@@ -81,6 +82,23 @@ http://127.0.0.1:8080
 
 ポートを変更した場合は、`WORDPRESS_SITE_URL`も同じ値に合わせてください。
 
+### 5. 送信メールを確認する
+
+WordPressから送信されたメールは外部へ配送されず、Mailpitに保存されます。初期設定では、次のURLから確認できます。
+
+```text
+http://127.0.0.1:8025
+```
+
+Web UIのポートを変更する場合は、`environments/default.env`の`MAILPIT_WEB_PORT`を変更してください。
+
+開発環境では、WordPressのメール送信元が次の値に統一されます。
+
+```text
+送信元アドレス: wordpress@example.test
+送信者名: WordPress Development
+```
+
 ## マウント先
 
 開発対象のリポジトリは、コンテナ内の次の2箇所へマウントされます。
@@ -100,7 +118,7 @@ http://127.0.0.1:8080
 
 ## 初期ログイン情報
 
-初期値は次のとおりです。必要に応じて`environments/.env`で変更してください。
+初期値は次のとおりです。必要に応じて`environments/default.env`で変更してください。
 
 ```text
 ユーザー名: admin
@@ -129,7 +147,7 @@ Dev Containerを閉じても、`shutdownAction`の設定によりコンテナは
 
 ```bash
 docker compose \
-  --env-file environments/.env \
+  --env-file environments/default.env \
   -f .devcontainer/default/compose.yaml \
   down
 ```
@@ -138,7 +156,7 @@ docker compose \
 
 ```bash
 docker compose \
-  --env-file environments/.env \
+  --env-file environments/default.env \
   -f .devcontainer/default/compose.yaml \
   down --volumes
 ```
