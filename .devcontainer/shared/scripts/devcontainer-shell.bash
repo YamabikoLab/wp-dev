@@ -13,20 +13,6 @@ devcontainer_workspace_dir() {
     fi
 }
 
-devcontainer_prompt_dir() {
-    local workspace_dir
-    workspace_dir="$(devcontainer_workspace_dir)"
-    local current_dir="${PWD}"
-
-    if [[ "${current_dir}" == "${workspace_dir}" ]]; then
-        printf '~'
-    elif [[ "${current_dir}" == "${workspace_dir}/"* ]]; then
-        printf '~/%s' "${current_dir#"${workspace_dir}/"}"
-    else
-        printf '%s' "${current_dir}"
-    fi
-}
-
 export CLICOLOR=1
 export LANG="${LANG:-${LOCALE:-C.UTF-8}}"
 export LC_ALL="${LC_ALL:-${LANG}}"
@@ -65,8 +51,6 @@ cdthemes() {
 cduploads() {
     cd /var/www/html/wp-content/uploads
 }
-
-PS1='\u@\h:$(devcontainer_prompt_dir)\$ '
 
 # VS Code統合ターミナルのTTYをCodexフック用に記録する
 if [[ $- == *i* ]] && tty -s; then
