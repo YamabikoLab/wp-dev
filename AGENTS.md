@@ -50,7 +50,7 @@ These instructions apply to the entire repository.
 - Run only checks applicable to the changed files.
 - For Compose, Dev Container, Docker, or environment-definition changes, validate the effective configuration with the active local environment file:
 
-  `docker compose --env-file environments/.env -f .devcontainer/default-env/compose.yaml config --quiet`
+  `docker compose --env-file environments/.env -f .devcontainer/default/compose.yaml config --quiet`
 
 - When adding another environment, validate that environment's Compose entry point instead of assuming the default environment covers it.
 - Run `git diff --check` for repository changes before handoff.

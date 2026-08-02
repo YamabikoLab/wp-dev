@@ -67,7 +67,7 @@ Visual Studio Codeで`wp-dev`を開き、コマンドパレットから次を実
 Dev Containers: Reopen in Container
 ```
 
-複数のDev Container構成が表示された場合は、`default-env`を選択します。
+複数のDev Container構成が表示された場合は、`default`を選択します。
 
 コンテナの作成時に、`wp-dev`内の初期化スクリプトが自動的に実行されます。
 
@@ -130,7 +130,7 @@ Dev Containerを閉じても、`shutdownAction`の設定によりコンテナは
 ```bash
 docker compose \
   --env-file environments/.env \
-  -f .devcontainer/default-env/compose.yaml \
+  -f .devcontainer/default/compose.yaml \
   down
 ```
 
@@ -139,6 +139,6 @@ docker compose \
 ```bash
 docker compose \
   --env-file environments/.env \
-  -f .devcontainer/default-env/compose.yaml \
+  -f .devcontainer/default/compose.yaml \
   down --volumes
 ```
