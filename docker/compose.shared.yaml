@@ -7,6 +7,7 @@ services:
       dockerfile: .devcontainer/shared/docker/Dockerfile
       args:
         WORDPRESS_IMAGE_TAG: ${WORDPRESS_IMAGE_TAG:?WORDPRESS_IMAGE_TAG is required}
+        LOGCUT_VERSION: ${LOGCUT_VERSION:?LOGCUT_VERSION is required}
         LOCAL_UID: ${LOCAL_UID:-1000}
         LOCAL_GID: ${LOCAL_GID:-1000}
         LOCALE: ${LOCALE:-ja_JP.UTF-8}

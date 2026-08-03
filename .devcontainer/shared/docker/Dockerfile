@@ -5,6 +5,7 @@ ARG NODE_VERSION=24.5.0
 ARG WP_CLI_VERSION=2.12.0
 ARG XDEBUG_VERSION=3.4.5
 ARG CODEX_CLI_VERSION=0.146.0
+ARG LOGCUT_VERSION=0.1.14
 ARG LOCAL_UID=1000
 ARG LOCAL_GID=1000
 ARG LOCALE=ja_JP.UTF-8
@@ -56,9 +57,14 @@ RUN set -eux; \
         xz-utils; \
     architecture="${TARGETARCH:-$(dpkg --print-architecture)}"; \
     case "$architecture" in \
-        amd64) node_arch='x64' ;; \
+        amd64) \
+            node_arch='x64'; \
+            logcut_target='x86_64-unknown-linux-gnu' ;; \
+        arm64) \
+            node_arch='arm64'; \
+            logcut_target='aarch64-unknown-linux-gnu' ;; \
         *) \
-            echo "Unsupported architecture: $architecture. The bundled logcut binary currently requires amd64." >&2; \
+            echo "Unsupported architecture: $architecture" >&2; \
             exit 1 ;; \
     esac; \
     node_archive="node-v${NODE_VERSION}-linux-${node_arch}.tar.xz"; \
@@ -67,6 +73,16 @@ RUN set -eux; \
     grep " ${node_archive}$" SHASUMS256.txt | sha256sum -c -; \
     tar -xJf "$node_archive" -C /usr/local --strip-components=1; \
     rm -f "$node_archive" SHASUMS256.txt; \
+    logcut_tag="v${LOGCUT_VERSION}"; \
+    logcut_archive="logcut-${logcut_tag}-${logcut_target}.tar.gz"; \
+    logcut_release_url="https://github.com/YamabikoLab/logcut/releases/download/${logcut_tag}"; \
+    curl -fsSLO "${logcut_release_url}/${logcut_archive}"; \
+    curl -fsSLO "${logcut_release_url}/SHA256SUMS"; \
+    grep " ${logcut_archive}$" SHA256SUMS | sha256sum -c -; \
+    tar -xzf "$logcut_archive"; \
+    install -m 0755 logcut /usr/local/bin/logcut; \
+    rm -f logcut "$logcut_archive" SHA256SUMS; \
+    logcut --version > /dev/null; \
     curl -fsSL \
         "https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar" \
         -o /usr/local/bin/wp; \
@@ -96,7 +112,6 @@ COPY --chmod=0755 .devcontainer/shared/scripts/terminal-bell.sh \
 COPY .devcontainer/shared/hooks/hooks.json \
     /usr/local/share/codex-hooks/hooks.json
 
-COPY --chmod=0755 .devcontainer/shared/bin/logcut /usr/local/bin/logcut
 COPY --chmod=0755 .devcontainer/shared/scripts/devcontainer-entrypoint.sh \
     /usr/local/bin/devcontainer-entrypoint
 
