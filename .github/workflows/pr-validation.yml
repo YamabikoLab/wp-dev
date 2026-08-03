@@ -31,7 +31,6 @@ jobs:
           for environment in default wp683; do
             cp "environments/${environment}.env.example" "environments/${environment}.env"
             sed -i \
-              -e 's#<your-project-name>#wp-dev-ci#g' \
               -e 's#<plugins|themes>#plugins#g' \
               -e 's#<your-plugin-slug-name|your-theme-slug-name>#example-plugin#g' \
               -e 's#../../<your-project-source-path>#../../.ci-project#g' \
