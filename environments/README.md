@@ -29,12 +29,11 @@ Update at least the following values for the WordPress project being developed:
 | `WORDPRESS_SITE_URL` | WordPress URL. Keep its port aligned with `WORDPRESS_PORT`. |
 | `WP_PROJECT_DIRECTORY` | WordPress project type: `plugins` or `themes`. |
 | `WP_PROJECT_SLUG` | Directory name used under `wp-content/plugins` or `wp-content/themes`. |
-| `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and the workspace. |
-| `WORKSPACE_NAME` | Directory name used for the project under `/workspaces`. |
+| `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and `/workspaces/project`. |
 
 During the image build, the matching amd64 or arm64 logcut release archive and `SHA256SUMS` are downloaded from GitHub. The archive is installed only after its checksum has been verified.
 
-The Dev Container opens `/workspaces` as its workspace. Use `cdw` to move to the project directory selected by `WORKSPACE_NAME`.
+The Dev Container opens `/workspaces` as its workspace. Use `cdw` to move to the project directory at `/workspaces/project`.
 
 The database and WordPress administrator credentials in the templates are local-development defaults only. Replace them when necessary, and never store real credentials in the repository.
 
