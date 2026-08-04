@@ -17,7 +17,7 @@ These instructions apply to the entire repository.
 
 - Make the smallest change that fully satisfies the current issue.
 - Keep the environment generic and reusable across WordPress plugin and theme projects.
-- Preserve configuration through `WP_PROJECT_DIRECTORY`, `WP_PROJECT_SLUG`, `WP_PROJECT_SOURCE_PATH`, and `WORKSPACE_NAME`; do not replace these with project-specific paths or names.
+- Preserve configuration through `WP_PROJECT_DIRECTORY`, `WP_PROJECT_SLUG`, and `WP_PROJECT_SOURCE_PATH`; do not replace these with project-specific paths or names.
 - Do not hard-code personal paths, hostnames, machine-specific values, repository names, plugin slugs, theme slugs, or ports that should remain configurable.
 - Keep per-environment Compose files thin and include the shared Compose definition instead of copying services.
 - Keep documentation aligned with the files, commands, environment variables, paths, and defaults that exist on the current branch.
@@ -34,7 +34,7 @@ These instructions apply to the entire repository.
 - `COMPOSE_PROJECT_NAME` and `WORDPRESS_PORT` must be unique when multiple environments may run at the same time.
 - Keep `WORDPRESS_SITE_URL` aligned with `WORDPRESS_PORT`.
 - `WP_PROJECT_DIRECTORY` must resolve to a valid WordPress content directory such as `plugins` or `themes`.
-- Mount the external project both into WordPress and into `/workspaces/<workspace-name>` without creating an additional copy of its source.
+- Mount the external project both into WordPress and into `/workspaces/project` without creating an additional copy of its source.
 - Preserve `create_host_path: false` for required bind mounts unless the issue explicitly changes missing-path behavior.
 
 ## Documentation responsibilities
