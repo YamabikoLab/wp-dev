@@ -43,7 +43,6 @@ COMPOSE_PROJECT_NAME=your-project-default
 WP_PROJECT_DIRECTORY=plugins
 WP_PROJECT_SLUG=your-plugin-slug
 WP_PROJECT_SOURCE_PATH=../../your-wordpress-project
-WORKSPACE_NAME=your-wordpress-project
 ```
 
 テーマを開発する場合は、`WP_PROJECT_DIRECTORY`を`themes`にします。
@@ -63,7 +62,6 @@ WP_PROJECT_DIRECTORY=themes
 | `WP_PROJECT_DIRECTORY`   | `plugins`または`themes`                                     |
 | `WP_PROJECT_SLUG`        | WordPress内で使用するプラグインまたはテーマのディレクトリ名 |
 | `WP_PROJECT_SOURCE_PATH` | 開発対象リポジトリへの相対パス                              |
-| `WORKSPACE_NAME`         | Dev Container内のワークスペース名                           |
 
 ### 3. Dev Containerを開く
 
@@ -112,8 +110,8 @@ Web UIのポートを変更する場合は、使用する環境設定ファイ�
 ## 構成の検証
 
 ```bash
-docker compose -f .devcontainer/default/compose.yaml config --quiet
-docker compose -f .devcontainer/wp683/compose.yaml config --quiet
+docker compose --env-file environments/default.env -f .devcontainer/default/compose.yaml config --quiet
+docker compose --env-file environments/wp683.env -f .devcontainer/wp683/compose.yaml config --quiet
 ```
 
 `wp683`のコンテナ内では、次のコマンドでバージョンを確認できます。
@@ -129,10 +127,10 @@ php --version
 
 ```text
 /var/www/html/wp-content/<plugins|themes>/<slug>
-/workspaces/<workspace-name>
+/workspaces/project
 ```
 
-1つ目はWordPressから読み込むためのパス、2つ目はVisual Studio Codeで編集するためのワークスペースです。
+1つ目はWordPressから読み込むためのパス、2つ目はVisual Studio Codeで編集するための固定ワークスペースです。
 
 `wp-dev`自体は次の場所へマウントされます。
 
