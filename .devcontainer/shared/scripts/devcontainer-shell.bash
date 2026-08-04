@@ -1,18 +1,5 @@
 # Dev container shell customization
 
-__DEVCONTAINER_SHELL_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-__WP_DEV_WORKSPACE_DIR="$(cd -- "${__DEVCONTAINER_SHELL_DIR}/../.." && pwd)"
-
-devcontainer_workspace_dir() {
-    if [[ -n "${DEVCONTAINER_WORKSPACE_DIR:-}" ]]; then
-        printf '%s' "${DEVCONTAINER_WORKSPACE_DIR}"
-    elif [[ -n "${WORKSPACE_NAME:-}" ]]; then
-        printf '/workspaces/%s' "${WORKSPACE_NAME}"
-    else
-        printf '%s' "${__WP_DEV_WORKSPACE_DIR}"
-    fi
-}
-
 export CLICOLOR=1
 export LANG="${LANG:-${LOCALE:-C.UTF-8}}"
 export LC_ALL="${LC_ALL:-${LANG}}"
@@ -29,11 +16,7 @@ alias grep='grep --color=auto'
 alias ..='cd ..'
 
 cdw() {
-    cd "$(devcontainer_workspace_dir)"
-}
-
-cde() {
-    cd "${__WP_DEV_WORKSPACE_DIR}"
+    cd /workspaces/project
 }
 
 cdwp() {
