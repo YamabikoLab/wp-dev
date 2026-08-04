@@ -57,6 +57,11 @@ WP_PROJECT_DIRECTORY=themes
 | ------------------------ | ----------------------------------------------------------- |
 | `COMPOSE_PROJECT_NAME`   | Docker Composeプロジェクト名                                |
 | `WORDPRESS_IMAGE_TAG`    | 使用するWordPress Dockerイメージのタグ                      |
+| `NODE_VERSION`           | 開発コンテナへインストールするNode.jsのバージョン           |
+| `WP_CLI_VERSION`         | 開発コンテナへインストールするWP-CLIのバージョン            |
+| `XDEBUG_VERSION`         | 開発コンテナへインストールするXdebugのバージョン            |
+| `CODEX_CLI_VERSION`      | 開発コンテナへインストールするCodex CLIのバージョン         |
+| `LOGCUT_VERSION`         | 開発コンテナへインストールするlogcutのバージョン            |
 | `WORDPRESS_PORT`         | ホスト側で公開するWordPressのポート                         |
 | `MAILPIT_WEB_PORT`       | MailpitのWeb UIを公開するホスト側ポート                     |
 | `WP_PROJECT_DIRECTORY`   | `plugins`または`themes`                                     |
@@ -75,6 +80,8 @@ Dev Containers: Reopen in Container
 
 - `default`: `environments/default.env`を使用
 - `wp683`: `environments/wp683.env`を使用
+
+Dev Containerが開くと、開発対象のリポジトリが`/workspaces/project`として直接表示されます。
 
 `wp683`のサンプル設定ではWordPressを`http://127.0.0.1:8081`、Mailpitを`http://127.0.0.1:8026`で公開します。
 
