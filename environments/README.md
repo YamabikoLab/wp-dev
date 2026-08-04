@@ -24,6 +24,10 @@ Update at least the following values for the WordPress project being developed:
 | --- | --- |
 | `COMPOSE_PROJECT_NAME` | Unique Docker Compose project name used to isolate containers, networks, and volumes. |
 | `WORDPRESS_IMAGE_TAG` | WordPress image tag used to build the development container. |
+| `NODE_VERSION` | Node.js version installed during the development image build. |
+| `WP_CLI_VERSION` | WP-CLI version installed during the development image build. |
+| `XDEBUG_VERSION` | Xdebug version installed during the development image build. |
+| `CODEX_CLI_VERSION` | Codex CLI version installed during the development image build. |
 | `LOGCUT_VERSION` | logcut release version installed during the development image build. Specify the version without the `v` prefix. |
 | `WORDPRESS_PORT` | Host port used to access WordPress. |
 | `WORDPRESS_SITE_URL` | WordPress URL. Keep its port aligned with `WORDPRESS_PORT`. |
@@ -33,7 +37,7 @@ Update at least the following values for the WordPress project being developed:
 
 During the image build, the matching amd64 or arm64 logcut release archive and `SHA256SUMS` are downloaded from GitHub. The archive is installed only after its checksum has been verified.
 
-The Dev Container opens `/workspaces` as its workspace. Use `cdw` to move to the project directory at `/workspaces/project`.
+The Dev Container opens the external project directly at `/workspaces/project`.
 
 The database and WordPress administrator credentials in the templates are local-development defaults only. Replace them when necessary, and never store real credentials in the repository.
 
