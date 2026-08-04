@@ -7,6 +7,10 @@ services:
       dockerfile: .devcontainer/shared/docker/Dockerfile
       args:
         WORDPRESS_IMAGE_TAG: ${WORDPRESS_IMAGE_TAG:?WORDPRESS_IMAGE_TAG is required}
+        NODE_VERSION: ${NODE_VERSION:?NODE_VERSION is required}
+        WP_CLI_VERSION: ${WP_CLI_VERSION:?WP_CLI_VERSION is required}
+        XDEBUG_VERSION: ${XDEBUG_VERSION:?XDEBUG_VERSION is required}
+        CODEX_CLI_VERSION: ${CODEX_CLI_VERSION:?CODEX_CLI_VERSION is required}
         LOGCUT_VERSION: ${LOGCUT_VERSION:?LOGCUT_VERSION is required}
         LOCAL_UID: ${LOCAL_UID:-1000}
         LOCAL_GID: ${LOCAL_GID:-1000}
