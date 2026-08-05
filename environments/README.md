@@ -40,6 +40,8 @@ During the image build, the matching amd64 or arm64 logcut release archive and `
 
 Playwright installs Chromium and its runtime dependencies into `/ms-playwright`. The browser files are readable and executable by the `www-data` user.
 
+Set `PLAYWRIGHT_VERSION` to the same version as the external project's `@playwright/test` or `playwright` dependency. When that project dependency is updated, update the environment file and rebuild the development image so `/ms-playwright` contains the matching browser executable.
+
 The Dev Container opens the external project directly at `/workspaces/project`.
 
 The database and WordPress administrator credentials in the templates are local-development defaults only. Replace them when necessary, and never store real credentials in the repository.
