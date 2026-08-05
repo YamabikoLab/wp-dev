@@ -50,11 +50,14 @@ RUN set -eux; \
         docker-compose-plugin \
         gh \
         git \
+        vim \
         less \
         locales \
         mariadb-client \
         msmtp \
         msmtp-mta \
+        gettext \
+        ripgrep \
         unzip \
         xz-utils; \
     architecture="${TARGETARCH:-$(dpkg --print-architecture)}"; \
