@@ -25,6 +25,7 @@ Update at least the following values for the WordPress project being developed:
 | `COMPOSE_PROJECT_NAME` | Unique Docker Compose project name used to isolate containers, networks, and volumes. |
 | `WORDPRESS_IMAGE_TAG` | WordPress image tag used to build the development container. |
 | `NODE_VERSION` | Node.js version installed during the development image build. |
+| `PLAYWRIGHT_VERSION` | Playwright version used to install the managed Chromium browser and its runtime dependencies. |
 | `WP_CLI_VERSION` | WP-CLI version installed during the development image build. |
 | `XDEBUG_VERSION` | Xdebug version installed during the development image build. |
 | `CODEX_CLI_VERSION` | Codex CLI version installed during the development image build. |
@@ -36,6 +37,10 @@ Update at least the following values for the WordPress project being developed:
 | `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and `/workspaces/project`. |
 
 During the image build, the matching amd64 or arm64 logcut release archive and `SHA256SUMS` are downloaded from GitHub. The archive is installed only after its checksum has been verified.
+
+Playwright installs Chromium and its runtime dependencies into `/ms-playwright`. The browser files are readable and executable by the `www-data` user.
+
+Set `PLAYWRIGHT_VERSION` to the same version as the external project's `@playwright/test` or `playwright` dependency. When that project dependency is updated, update the environment file and rebuild the development image so `/ms-playwright` contains the matching browser executable.
 
 The Dev Container opens the external project directly at `/workspaces/project`.
 

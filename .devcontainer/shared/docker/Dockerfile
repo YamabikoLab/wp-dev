@@ -2,6 +2,7 @@ ARG WORDPRESS_IMAGE_TAG=7.0.2-php8.3-apache
 FROM wordpress:${WORDPRESS_IMAGE_TAG}
 
 ARG NODE_VERSION
+ARG PLAYWRIGHT_VERSION
 ARG WP_CLI_VERSION
 ARG XDEBUG_VERSION
 ARG CODEX_CLI_VERSION
@@ -13,7 +14,8 @@ ARG TZ=Asia/Tokyo
 ARG TARGETARCH
 
 ENV TZ=${TZ} \
-    LANG=${LOCALE}
+    LANG=${LOCALE} \
+    PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 RUN groupmod --gid "${LOCAL_GID}" www-data \
     && usermod --uid "${LOCAL_UID}" --gid "${LOCAL_GID}" www-data \
@@ -48,11 +50,14 @@ RUN set -eux; \
         docker-compose-plugin \
         gh \
         git \
+        vim \
         less \
         locales \
         mariadb-client \
         msmtp \
         msmtp-mta \
+        gettext \
+        ripgrep \
         unzip \
         xz-utils; \
     architecture="${TARGETARCH:-$(dpkg --print-architecture)}"; \
@@ -92,6 +97,11 @@ RUN set -eux; \
     gh --version > /dev/null; \
     apt-get purge -y --auto-remove $PHPIZE_DEPS; \
     rm -rf /var/lib/apt/lists/* /tmp/pear ~/.pearrc
+
+RUN npx --yes "playwright@${PLAYWRIGHT_VERSION}" \
+        install --with-deps chromium \
+    && chmod -R a+rX "${PLAYWRIGHT_BROWSERS_PATH}" \
+    && rm -rf /root/.npm /var/lib/apt/lists/*
 
 RUN case "${LOCALE}" in \
         ""|*[![:alnum:]_.@-]*) \
