@@ -26,6 +26,7 @@ Update at least the following values for the WordPress project being developed:
 | `WORDPRESS_IMAGE_TAG` | WordPress image tag used to build the development container. |
 | `NODE_VERSION` | Node.js version installed during the development image build. |
 | `PLAYWRIGHT_VERSION` | Playwright version used to install the managed Chromium browser and its runtime dependencies. |
+| `PLAYWRIGHT_ONLY_SHELL` | Set to `true` to install only Chromium headless shell, or `false` to keep the full Chromium installation. |
 | `WP_CLI_VERSION` | WP-CLI version installed during the development image build. |
 | `XDEBUG_VERSION` | Xdebug version installed during the development image build. |
 | `CODEX_CLI_VERSION` | Codex CLI version installed during the development image build. |
@@ -38,7 +39,7 @@ Update at least the following values for the WordPress project being developed:
 
 During the image build, the matching amd64 or arm64 logcut release archive and `SHA256SUMS` are downloaded from GitHub. The archive is installed only after its checksum has been verified.
 
-Playwright installs Chromium and its runtime dependencies into `/ms-playwright`. The browser files are readable and executable by the `www-data` user.
+Playwright installs Chromium and its runtime dependencies into `/ms-playwright`. The browser files are readable and executable by the `www-data` user. Leave `PLAYWRIGHT_ONLY_SHELL=false` when headed mode, code generation, or the full Chromium executable is required. Set it to `true` for headless-only test environments to avoid downloading the full Chromium package. Values other than `true` or `false` cause the image build to fail.
 
 Set `PLAYWRIGHT_VERSION` to the same version as the external project's `@playwright/test` or `playwright` dependency. When that project dependency is updated, update the environment file and rebuild the development image so `/ms-playwright` contains the matching browser executable.
 
