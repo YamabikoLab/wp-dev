@@ -23,6 +23,7 @@ Update at least the following values for the WordPress project being developed:
 | Variable | Purpose |
 | --- | --- |
 | `COMPOSE_PROJECT_NAME` | Unique Docker Compose project name used to isolate containers, networks, and volumes. |
+| `COMPOSER_VERSION` | Composer image tag used to provide the Composer executable during the development image build. |
 | `WORDPRESS_IMAGE_TAG` | WordPress image tag used to build the development container. |
 | `NODE_VERSION` | Node.js version installed during the development image build. |
 | `PLAYWRIGHT_VERSION` | Playwright version used to install the managed Chromium browser and its runtime dependencies. |
@@ -36,6 +37,8 @@ Update at least the following values for the WordPress project being developed:
 | `WP_PROJECT_DIRECTORY` | WordPress project type: `plugins` or `themes`. |
 | `WP_PROJECT_SLUG` | Directory name used under `wp-content/plugins` or `wp-content/themes`. |
 | `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and `/workspaces/project`. |
+
+Composer is copied from the `composer:${COMPOSER_VERSION}` image into the WordPress development image. Use a valid Composer image tag, such as `2.8`, and rebuild the image after changing it.
 
 During the image build, the matching amd64 or arm64 logcut release archive and `SHA256SUMS` are downloaded from GitHub. The archive is installed only after its checksum has been verified.
 
