@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 
+ARG COMPOSER_VERSION=2.8
 ARG WORDPRESS_IMAGE_TAG=7.0.2-php8.3-apache
+FROM composer:${COMPOSER_VERSION} AS composer-source
 FROM wordpress:${WORDPRESS_IMAGE_TAG}
 
 ARG NODE_VERSION
@@ -17,8 +19,6 @@ ARG TZ=Asia/Tokyo
 ARG TARGETARCH
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-
-COPY --from=composer:2.8 /usr/bin/composer /usr/local/bin/composer
 
 RUN set -eux; \
     apt-get update; \
@@ -128,6 +128,9 @@ RUN set -eux; \
 RUN --mount=type=cache,target=/root/.npm \
     npm install --global "@openai/codex@${CODEX_CLI_VERSION}" \
     && codex --version > /dev/null
+
+COPY --from=composer-source /usr/bin/composer /usr/local/bin/composer
+RUN composer --version > /dev/null
 
 RUN case "${LOCALE}" in \
         ""|*[![:alnum:]_.@-]*) \
