@@ -17,10 +17,10 @@ ENV TZ=${TZ} \
     LANG=${LOCALE} \
     PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
-RUN groupmod --gid "${LOCAL_GID}" www-data \
-    && usermod --uid "${LOCAL_UID}" --gid "${LOCAL_GID}" www-data \
-    && mkdir -p /var/www/.vscode-server /var/www/.codex /var/www/.config/gh \
-    && chown -R www-data:www-data /var/www \
+RUN groupadd --gid "${LOCAL_GID}" developer \
+    && useradd --uid "${LOCAL_UID}" --gid "${LOCAL_GID}" --create-home --shell /bin/bash developer \
+    && mkdir -p /home/developer/.vscode-server /home/developer/.codex /home/developer/.config/gh \
+    && chown -R developer:developer /home/developer \
     && install -m 0755 -d /usr/local/share/codex-hooks /usr/local/share/wp-dev/apache
 
 COPY --from=composer:2.8 /usr/bin/composer /usr/local/bin/composer
@@ -126,6 +126,8 @@ COPY .devcontainer/shared/hooks/hooks.json \
 
 COPY --chmod=0755 .devcontainer/shared/scripts/devcontainer-entrypoint.sh \
     /usr/local/bin/devcontainer-entrypoint
+COPY --chmod=0755 .devcontainer/shared/scripts/devcontainer-dev-entrypoint.sh \
+    /usr/local/bin/devcontainer-dev-entrypoint
 
 WORKDIR /var/www/html
 
