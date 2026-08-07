@@ -89,6 +89,7 @@ services:
   dev:
     build: *development-image-build
     user: developer
+    network_mode: service:wordpress
     entrypoint:
       - /usr/local/bin/devcontainer-dev-entrypoint
     command:
