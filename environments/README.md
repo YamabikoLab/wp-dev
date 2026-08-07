@@ -30,11 +30,13 @@ Update at least the following values for the WordPress project being developed:
 | `XDEBUG_VERSION` | Xdebug version installed during the development image build. |
 | `CODEX_CLI_VERSION` | Codex CLI version installed during the development image build. |
 | `LOGCUT_VERSION` | logcut release version installed during the development image build. Specify the version without the `v` prefix. |
-| `WORDPRESS_PORT` | Host port used to access WordPress. |
-| `WORDPRESS_SITE_URL` | WordPress URL. Keep its port aligned with `WORDPRESS_PORT`. |
+| `WORDPRESS_HOST` | Host name used by the canonical WordPress URL. |
+| `WORDPRESS_PORT` | WordPress port used by both the host URL and the additional Apache listener inside the Dev Container. |
 | `WP_PROJECT_DIRECTORY` | WordPress project type: `plugins` or `themes`. |
 | `WP_PROJECT_SLUG` | Directory name used under `wp-content/plugins` or `wp-content/themes`. |
 | `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and `/workspaces/project`. |
+
+`WORDPRESS_URL` is derived by Compose from `WORDPRESS_HOST` and `WORDPRESS_PORT`. Do not add a separate `WORDPRESS_URL` value to an environment file. The same URL is used by WordPress and exposed as `WP_BASE_URL` for Playwright. See [WordPress URL configuration](../docs/wordpress-url.md) for the networking and canonical-URL design.
 
 During the image build, the matching amd64 or arm64 logcut release archive and `SHA256SUMS` are downloaded from GitHub. The archive is installed only after its checksum has been verified.
 
