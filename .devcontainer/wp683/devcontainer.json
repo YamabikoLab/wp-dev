@@ -1,8 +1,8 @@
 {
   "name": "wp-dev: wp683",
   "dockerComposeFile": "compose.yaml",
-  "service": "wordpress",
-  "runServices": ["db", "wordpress"],
+  "service": "dev",
+  "runServices": ["db", "mailpit", "wordpress", "dev"],
   "workspaceFolder": "/workspaces/project",
   "shutdownAction": "none",
   "overrideCommand": false,
@@ -75,5 +75,5 @@
     }
   },
   "postCreateCommand": "bash /workspaces/wp-dev/.devcontainer/shared/scripts/ai-tool-data.sh --restore && bash /workspaces/wp-dev/.devcontainer/shared/scripts/shell-setup.sh",
-  "remoteUser": "www-data"
+  "remoteUser": "developer"
 }
