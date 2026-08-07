@@ -32,7 +32,7 @@ These instructions apply to the entire repository.
 - Each environment name must remain consistent across its directory name, Dev Container configuration, Compose entry point, and environment variables.
 - New environments should start from the existing example and shared definitions rather than copying the full stack.
 - `COMPOSE_PROJECT_NAME` and `WORDPRESS_PORT` must be unique when multiple environments may run at the same time.
-- Keep `WORDPRESS_SITE_URL` aligned with `WORDPRESS_PORT`.
+- Keep the canonical WordPress URL derived from `WORDPRESS_HOST` and `WORDPRESS_PORT`; do not introduce a separate per-environment URL value.
 - `WP_PROJECT_DIRECTORY` must resolve to a valid WordPress content directory such as `plugins` or `themes`.
 - Mount the external project both into WordPress and into `/workspaces/project` without creating an additional copy of its source.
 - Preserve `create_host_path: false` for required bind mounts unless the issue explicitly changes missing-path behavior.
@@ -41,6 +41,7 @@ These instructions apply to the entire repository.
 
 - Put direct agent working instructions in `AGENTS.md`.
 - Put user-facing setup and operating instructions in `README.md`.
+- Put focused design explanations in `docs/` and link to them from the relevant user-facing documentation.
 - Put environment-creation instructions in `environments/README.md`.
 - Update the relevant documentation whenever a command, directory boundary, environment variable, mount target, default value, or required dependency changes.
 - Avoid duplicating long instructions across documents; keep one clear source of truth and link or refer to it where appropriate.

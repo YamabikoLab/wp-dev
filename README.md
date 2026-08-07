@@ -6,6 +6,7 @@ WordPressプラグイン・テーマ開発用の共通Dev Container環境です�
 
 <img width="1448" height="1086" alt="wp-dev-overview" src="https://github.com/user-attachments/assets/2a422f72-5d27-4883-9441-0ba5b6e32510" />
 
+WordPressの正規URLと、ホスト・Dev Container・Playwrightからのアクセス方法については、[WordPress URL 構成](docs/wordpress-url.md)を参照してください。
 
 ## 必要なもの
 
@@ -58,15 +59,19 @@ WP_PROJECT_DIRECTORY=themes
 | `COMPOSE_PROJECT_NAME`   | Docker Composeプロジェクト名                                |
 | `WORDPRESS_IMAGE_TAG`    | 使用するWordPress Dockerイメージのタグ                      |
 | `NODE_VERSION`           | 開発コンテナへインストールするNode.jsのバージョン           |
+| `PLAYWRIGHT_VERSION`     | Chromiumのインストールに使用するPlaywrightのバージョン      |
 | `WP_CLI_VERSION`         | 開発コンテナへインストールするWP-CLIのバージョン            |
 | `XDEBUG_VERSION`         | 開発コンテナへインストールするXdebugのバージョン            |
 | `CODEX_CLI_VERSION`      | 開発コンテナへインストールするCodex CLIのバージョン         |
 | `LOGCUT_VERSION`         | 開発コンテナへインストールするlogcutのバージョン            |
-| `WORDPRESS_PORT`         | ホスト側で公開するWordPressのポート                         |
+| `WORDPRESS_HOST`         | WordPressの正規URLに使用するホスト名                         |
+| `WORDPRESS_PORT`         | WordPressの公開ポート                                       |
 | `MAILPIT_WEB_PORT`       | MailpitのWeb UIを公開するホスト側ポート                     |
 | `WP_PROJECT_DIRECTORY`   | `plugins`または`themes`                                     |
 | `WP_PROJECT_SLUG`        | WordPress内で使用するプラグインまたはテーマのディレクトリ名 |
 | `WP_PROJECT_SOURCE_PATH` | 開発対象リポジトリへの相対パス                              |
+
+`WORDPRESS_URL`は`WORDPRESS_HOST`と`WORDPRESS_PORT`からDocker Composeが導出します。環境設定ファイルへ個別に設定しないでください。
 
 ### 3. Dev Containerを開く
 
@@ -95,7 +100,7 @@ Dev Containerが開くと、開発対象のリポジトリが`/workspaces/projec
 http://127.0.0.1:8080
 ```
 
-ポートを変更した場合は、`WORDPRESS_SITE_URL`も同じ値に合わせてください。
+URLを変更する場合は、使用する環境設定ファイルの`WORDPRESS_HOST`または`WORDPRESS_PORT`を変更してください。同じ正規URLをホストとDev Containerの両方から利用する仕組みは、[WordPress URL 構成](docs/wordpress-url.md)で説明しています。
 
 ### 5. 送信メールを確認する
 

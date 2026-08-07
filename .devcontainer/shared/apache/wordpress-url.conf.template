@@ -1,0 +1,9 @@
+Listen ${WORDPRESS_PORT}
+
+<VirtualHost *:${WORDPRESS_PORT}>
+    ServerName ${WORDPRESS_HOST}
+    DocumentRoot /var/www/html
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
