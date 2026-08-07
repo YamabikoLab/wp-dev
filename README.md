@@ -86,7 +86,7 @@ Dev Containers: Reopen in Container
 - `default`: `environments/default.env`を使用
 - `wp683`: `environments/wp683.env`を使用
 
-Dev Containerが開くと、開発対象のリポジトリが`/workspaces/project`として直接表示されます。
+Dev Containerは`dev`サービスへ接続し、`developer`ユーザーとして起動します。開発対象のリポジトリは`/workspaces/project`として直接表示されます。
 
 `wp683`のサンプル設定ではWordPressを`http://127.0.0.1:8081`、Mailpitを`http://127.0.0.1:8026`で公開します。
 
@@ -119,6 +119,24 @@ Web UIのポートを変更する場合は、使用する環境設定ファイ�
 送信者名: WordPress Development
 ```
 
+## サービスと権限分離
+
+WordPressの実行環境と開発ツールの認証情報を分離するため、役割を2つのサービスへ分けています。
+
+| サービス | 実行ユーザー | 主な役割 |
+| -------- | ------------ | -------- |
+| `wordpress` | `www-data` | Apache/PHP、WordPressの実行 |
+| `dev` | `developer` | Visual Studio Code、Codex CLI、GitHub CLI、開発コマンド |
+
+CodexとGitHub CLIの認証データは`dev`サービスだけにマウントされます。
+
+```text
+/home/developer/.codex
+/home/developer/.config/gh
+```
+
+`wordpress`サービスにはこれらのボリュームをマウントしないため、WordPress/PHPプロセスから開発ツールの認証データへアクセスできません。Dockerソケットもマウントしません。
+
 ## 構成の検証
 
 ```bash
@@ -133,6 +151,13 @@ wp core version
 php --version
 ```
 
+開発用サービスでは、次のコマンドで開発ツールを確認できます。
+
+```bash
+codex --version
+gh auth status
+```
+
 ## マウント先
 
 開発対象のリポジトリは、コンテナ内の次の2箇所へマウントされます。
@@ -144,7 +169,7 @@ php --version
 
 1つ目はWordPressから読み込むためのパス、2つ目はVisual Studio Codeで編集するための固定ワークスペースです。
 
-`wp-dev`自体は次の場所へマウントされます。
+`wp-dev`自体は開発用`dev`サービスの次の場所へマウントされます。
 
 ```text
 /workspaces/wp-dev
@@ -168,8 +193,10 @@ php --version
 
 - WordPress本体とアップロードデータ
 - MariaDBのデータ
-- Codexの設定データ
-- GitHub CLIの設定データ
+- Codexの設定データ（`dev`サービスの`/home/developer/.codex`）
+- GitHub CLIの設定データ（`dev`サービスの`/home/developer/.config/gh`）
+
+CodexとGitHub CLIのボリュームは`wordpress`サービスにはマウントされません。
 
 環境を完全に初期化する場合は、対象のComposeプロジェクトに紐づくボリュームも削除してください。
 
