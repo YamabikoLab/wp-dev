@@ -71,6 +71,4 @@ PHP;
     ' "${WORDPRESS_CONFIG_FILE}"
 fi
 
-chown -R www-data:www-data /var/www/html
-
 exec docker-entrypoint.sh "$@"
