@@ -6,6 +6,7 @@
   "workspaceFolder": "/workspaces/project",
   "shutdownAction": "none",
   "overrideCommand": false,
+  "updateRemoteUserUID": false,
   "waitFor": "postCreateCommand",
   "customizations": {
     "vscode": {
@@ -93,6 +94,6 @@
       }
     }
   },
-  "postCreateCommand": "bash /workspaces/wp-dev/.devcontainer/shared/scripts/ai-tool-data.sh --restore && bash /workspaces/wp-dev/.devcontainer/shared/scripts/shell-setup.sh",
-  "remoteUser": "www-data"
+  "postCreateCommand": "bash /workspaces/wp-dev/.devcontainer/shared/scripts/shell-setup.sh",
+  "remoteUser": "developer"
 }

@@ -45,9 +45,6 @@ services:
         if (!defined('WP_SITEURL')) {
             define('WP_SITEURL', getenv('WORDPRESS_URL'));
         }
-
-      CODEX_HOME: /var/www/.codex
-      GH_CONFIG_DIR: /var/www/.config/gh
     ports:
       - "127.0.0.1:${WORDPRESS_PORT:?WORDPRESS_PORT is required}:80"
     volumes:
@@ -86,14 +83,6 @@ services:
         read_only: true
         bind:
           create_host_path: false
-
-      - type: volume
-        source: codex_data
-        target: /var/www/.codex
-
-      - type: volume
-        source: gh_config
-        target: /var/www/.config/gh
 
       - type: bind
         source: ../.devcontainer/shared/php/php.ini
@@ -137,5 +126,3 @@ services:
 volumes:
   wordpress_data:
   db_data:
-  codex_data:
-  gh_config:

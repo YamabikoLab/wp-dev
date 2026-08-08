@@ -67,6 +67,8 @@ WP_PROJECT_DIRECTORY=themes
 | `WORDPRESS_HOST`         | WordPressの正規URLに使用するホスト名                         |
 | `WORDPRESS_PORT`         | WordPressの公開ポート                                       |
 | `MAILPIT_WEB_PORT`       | MailpitのWeb UIを公開するホスト側ポート                     |
+| `LOCAL_UID`              | Dev Containerの`developer`ユーザーに割り当てるUID           |
+| `LOCAL_GID`              | Dev Containerの`developer`ユーザーに割り当てるGID           |
 | `WP_PROJECT_DIRECTORY`   | `plugins`または`themes`                                     |
 | `WP_PROJECT_SLUG`        | WordPress内で使用するプラグインまたはテーマのディレクトリ名 |
 | `WP_PROJECT_SOURCE_PATH` | 開発対象リポジトリへの相対パス                              |
@@ -86,7 +88,9 @@ Dev Containers: Reopen in Container
 - `default`: `environments/default.env`を使用
 - `wp683`: `environments/wp683.env`を使用
 
-Dev Containerが開くと、開発対象のリポジトリが`/workspaces/project`として直接表示されます。
+Dev Containerは`developer`ユーザーで開き、開発対象のリポジトリが`/workspaces/project`として直接表示されます。`developer`のUID/GIDは環境設定の`LOCAL_UID` / `LOCAL_GID`を使用します。
+
+WordPress、Apache、PHPはベースイメージ標準の`www-data`で実行し、`www-data`のUID/GIDは`LOCAL_UID` / `LOCAL_GID`へ変更しません。
 
 `wp683`のサンプル設定ではWordPressを`http://127.0.0.1:8081`、Mailpitを`http://127.0.0.1:8026`で公開します。
 
@@ -119,11 +123,37 @@ Web UIのポートを変更する場合は、使用する環境設定ファイ�
 送信者名: WordPress Development
 ```
 
+## 開発ユーザーとCLI認証情報
+
+VS Code、Git、npm、Composer、WP-CLI、Codex CLI、GitHub CLIなどの開発操作は`developer`ユーザーで実行します。
+
+CodexとGitHub CLIの認証情報は次の`developer`専用領域へ保存されます。
+
+```text
+/home/developer/.codex
+/home/developer/.config/gh
+```
+
+これらのディレクトリは`developer`だけがアクセスできる権限で作成されます。WordPress/PHPの`www-data`から認証情報を読み取らせないためです。
+
+CLI認証情報用のDockerボリュームは使用しません。Dev Containerまたはコンテナを再作成すると認証情報は失われるため、必要に応じてCodex CLIとGitHub CLIを再認証してください。
+
+通常のCodex起動には`codex`コマンドを使用します。
+
 ## 構成の検証
 
 ```bash
 docker compose --env-file environments/default.env -f .devcontainer/default/compose.yaml config --quiet
 docker compose --env-file environments/wp683.env -f .devcontainer/wp683/compose.yaml config --quiet
+```
+
+Dev Container内では、次のコマンドで実行ユーザーと開発ツールを確認できます。
+
+```bash
+whoami
+id
+codex --version
+gh auth status
 ```
 
 `wp683`のコンテナ内では、次のコマンドでバージョンを確認できます。
@@ -168,8 +198,8 @@ php --version
 
 - WordPress本体とアップロードデータ
 - MariaDBのデータ
-- Codexの設定データ
-- GitHub CLIの設定データ
+
+CodexとGitHub CLIの認証情報は永続化しません。
 
 環境を完全に初期化する場合は、対象のComposeプロジェクトに紐づくボリュームも削除してください。
 
