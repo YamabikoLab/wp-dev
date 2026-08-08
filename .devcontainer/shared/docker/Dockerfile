@@ -30,8 +30,6 @@ RUN groupadd --gid "${LOCAL_GID}" developer \
         /home/developer/.config/gh \
     && install -m 0755 -d /usr/local/share/codex-hooks /usr/local/share/wp-dev/apache
 
-COPY --from=composer:2.8 /usr/bin/composer /usr/local/bin/composer
-
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
@@ -154,12 +152,6 @@ RUN case "${LOCALE}" in \
 
 ENV TZ=${TZ} \
     LANG=${LOCALE}
-
-RUN groupmod --gid "${LOCAL_GID}" www-data \
-    && usermod --uid "${LOCAL_UID}" --gid "${LOCAL_GID}" www-data \
-    && mkdir -p /var/www/.vscode-server /var/www/.codex /var/www/.config/gh \
-    && chown -R www-data:www-data /var/www \
-    && install -m 0755 -d /usr/local/share/codex-hooks
 
 COPY docker/wordpress/mu-plugins \
     /usr/src/wordpress/wp-content/mu-plugins
