@@ -28,6 +28,8 @@ else
     a2enconf wp-dev-wordpress-url >/dev/null
 fi
 
+install -o developer -g developer -m 0700 -d /workspaces
+
 mkdir -p \
     /var/www/html \
     "${MU_PLUGIN_TARGET_DIR}"
