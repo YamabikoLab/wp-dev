@@ -55,6 +55,7 @@ services:
       - type: bind
         source: ${WP_PROJECT_SOURCE_PATH:?WP_PROJECT_SOURCE_PATH is required}
         target: /var/www/html/wp-content/${WP_PROJECT_DIRECTORY}/${WP_PROJECT_SLUG}
+        read_only: true
         bind:
           create_host_path: false
 

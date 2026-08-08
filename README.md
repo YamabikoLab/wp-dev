@@ -174,11 +174,15 @@ php --version
 
 1つ目はWordPressから読み込むためのパス、2つ目はVisual Studio Codeで編集するための固定ワークスペースです。
 
+WordPress側のマウントは読み取り専用です。WordPress、Apache、PHPを実行する`www-data`から開発対象ソースへ書き込めません。一方、`/workspaces/project`は`developer`による編集用として読み書き可能なままです。両方とも同じホスト側ソースを参照するため、`developer`が生成したビルド成果物はWordPress側の読み取り専用マウントにもそのまま反映されます。
+
 `wp-dev`自体は次の場所へマウントされます。
 
 ```text
 /workspaces/wp-dev
 ```
+
+`/workspaces`は`developer`所有の`0700`相当で構成されます。そのため、`developer`は`/workspaces/project`と`/workspaces/wp-dev`を通常どおり利用できますが、WordPress/PHPの`www-data`は`/workspaces`配下を辿れません。WordPress側の読み取り専用マウントと組み合わせ、同じホスト側ソースへの別のread-write経路をWordPress/PHPから利用できないようにしています。
 
 ## 初期ログイン情報
 
