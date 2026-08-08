@@ -20,6 +20,18 @@ ARG TARGETARCH
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
+RUN groupadd --gid "${LOCAL_GID}" developer \
+    && useradd --uid "${LOCAL_UID}" --gid "${LOCAL_GID}" --create-home --shell /bin/bash developer \
+    && install -o developer -g developer -m 0700 -d \
+        /home/developer \
+        /home/developer/.vscode-server \
+        /home/developer/.codex \
+        /home/developer/.config \
+        /home/developer/.config/gh \
+    && install -m 0755 -d /usr/local/share/codex-hooks /usr/local/share/wp-dev/apache
+
+COPY --from=composer:2.8 /usr/bin/composer /usr/local/bin/composer
+
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
@@ -151,6 +163,8 @@ RUN groupmod --gid "${LOCAL_GID}" www-data \
 
 COPY docker/wordpress/mu-plugins \
     /usr/src/wordpress/wp-content/mu-plugins
+COPY .devcontainer/shared/apache/wordpress-url.conf.template \
+    /usr/local/share/wp-dev/apache/wordpress-url.conf.template
 
 COPY --chmod=0755 .devcontainer/shared/scripts/terminal-bell.sh \
     /usr/local/share/codex-hooks/terminal-bell.sh

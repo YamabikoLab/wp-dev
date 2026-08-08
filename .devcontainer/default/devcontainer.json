@@ -6,6 +6,7 @@
   "workspaceFolder": "/workspaces/project",
   "shutdownAction": "none",
   "overrideCommand": false,
+  "updateRemoteUserUID": false,
   "waitFor": "postCreateCommand",
   "customizations": {
     "vscode": {
@@ -20,13 +21,32 @@
       ],
       "settings": {
         "[php]": {
-          "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+          "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
+          "editor.formatOnSave": false
         },
         "[javascript]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+          }
+        },
+        "[javascriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+          }
         },
         "[typescript]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+          }
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+          }
         },
         "[json]": {
           "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -35,10 +55,16 @@
           "editor.defaultFormatter": "esbenp.prettier-vscode"
         },
         "[css]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
+          "editor.formatOnSave": false,
+          "editor.codeActionsOnSave": {
+            "source.fixAll.stylelint": "explicit"
+          }
         },
         "[scss]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
+          "editor.formatOnSave": false,
+          "editor.codeActionsOnSave": {
+            "source.fixAll.stylelint": "explicit"
+          }
         },
         "[yaml]": {
           "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -57,7 +83,7 @@
           "**/node_modules": true
         },
         "terminal.integrated.defaultProfile.linux": "bash",
-        "php.validate.executablePath": "/usr/local/bin/php",
+        "php.validate.enable": false,
         "intelephense.environment.phpVersion": "8.3",
         "eslint.validate": [
           "javascript",
@@ -68,6 +94,6 @@
       }
     }
   },
-  "postCreateCommand": "bash /workspaces/wp-dev/.devcontainer/shared/scripts/ai-tool-data.sh --restore && bash /workspaces/wp-dev/.devcontainer/shared/scripts/shell-setup.sh",
-  "remoteUser": "www-data"
+  "postCreateCommand": "bash /workspaces/wp-dev/.devcontainer/shared/scripts/shell-setup.sh",
+  "remoteUser": "developer"
 }

@@ -8,6 +8,11 @@ DEVCONTAINER_SHELL_BASHRC="${SCRIPT_DIR}/devcontainer-shell.bash"
 SOURCE_LINE="source ${DEVCONTAINER_SHELL_BASHRC}"
 LEGACY_BASHRC_BASENAME="bashrc.bak"
 OLD_SOURCE_LINE="source ${SCRIPT_DIR}/${LEGACY_BASHRC_BASENAME}"
+CODEX_HOME="${CODEX_HOME:-${HOME}/.codex}"
+GH_CONFIG_DIR="${GH_CONFIG_DIR:-${HOME}/.config/gh}"
+
+install -d -m 0700 "${CODEX_HOME}" "${GH_CONFIG_DIR}"
+install -m 0600 /usr/local/share/codex-hooks/hooks.json "${CODEX_HOME}/hooks.json"
 
 touch "${BASHRC_FILE}"
 
