@@ -77,6 +77,7 @@ fi
 
 : "${WORDPRESS_URL:?WORDPRESS_URL is required}"
 : "${WORDPRESS_SITE_TITLE:?WORDPRESS_SITE_TITLE is required}"
+: "${WORDPRESS_LOCALE:?WORDPRESS_LOCALE is required}"
 : "${WORDPRESS_ADMIN_USER:?WORDPRESS_ADMIN_USER is required}"
 : "${WORDPRESS_ADMIN_PASSWORD:?WORDPRESS_ADMIN_PASSWORD is required}"
 : "${WORDPRESS_ADMIN_EMAIL:?WORDPRESS_ADMIN_EMAIL is required}"
@@ -87,6 +88,7 @@ if ! "${wp_cli[@]}" core is-installed >/dev/null 2>&1; then
     "${wp_cli[@]}" core install \
         --url="${WORDPRESS_URL}" \
         --title="${WORDPRESS_SITE_TITLE}" \
+        --locale="${WORDPRESS_LOCALE}" \
         --admin_user="${WORDPRESS_ADMIN_USER}" \
         --admin_password="${WORDPRESS_ADMIN_PASSWORD}" \
         --admin_email="${WORDPRESS_ADMIN_EMAIL}" \
