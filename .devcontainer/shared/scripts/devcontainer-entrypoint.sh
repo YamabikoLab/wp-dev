@@ -93,6 +93,10 @@ if ! "${wp_cli[@]}" core is-installed >/dev/null 2>&1; then
         --admin_password="${WORDPRESS_ADMIN_PASSWORD}" \
         --admin_email="${WORDPRESS_ADMIN_EMAIL}" \
         --skip-email
+
+    if [[ "${WORDPRESS_LOCALE}" != "en_US" ]]; then
+        "${wp_cli[@]}" language core install "${WORDPRESS_LOCALE}" --activate
+    fi
 elif user_id="$("${wp_cli[@]}" user get "${WORDPRESS_ADMIN_USER}" --field=ID 2>/dev/null)"; then
     "${wp_cli[@]}" user update "${user_id}" \
         --user_pass="${WORDPRESS_ADMIN_PASSWORD}" \
