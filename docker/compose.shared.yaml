@@ -12,6 +12,7 @@ services:
         PLAYWRIGHT_VERSION: ${PLAYWRIGHT_VERSION:?PLAYWRIGHT_VERSION is required}
         PLAYWRIGHT_ONLY_SHELL: ${PLAYWRIGHT_ONLY_SHELL:-false}
         WP_CLI_VERSION: ${WP_CLI_VERSION:?WP_CLI_VERSION is required}
+        WP_CLI_SHA256: ${WP_CLI_SHA256:?WP_CLI_SHA256 is required}
         XDEBUG_VERSION: ${XDEBUG_VERSION:?XDEBUG_VERSION is required}
         CODEX_CLI_VERSION: ${CODEX_CLI_VERSION:?CODEX_CLI_VERSION is required}
         LOGCUT_VERSION: ${LOGCUT_VERSION:?LOGCUT_VERSION is required}
@@ -125,7 +126,7 @@ services:
       start_period: 10s
 
   mailpit:
-    image: axllent/mailpit:latest
+    image: axllent/mailpit:v1.30.7
     environment:
       TZ: ${TZ:-Asia/Tokyo}
     ports:
