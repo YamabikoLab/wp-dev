@@ -35,6 +35,7 @@ Update at least the following values for the WordPress project being developed:
 | `LOGCUT_VERSION` | logcut release version installed during the development image build. Specify the version without the `v` prefix. |
 | `WORDPRESS_HOST` | Host name used by the canonical WordPress URL. |
 | `WORDPRESS_PORT` | WordPress port used by both the host URL and the additional Apache listener inside the Dev Container. |
+| `WORDPRESS_LOCALE` | WordPress locale used only when WordPress is installed for the first time. Defaults to `ja`. |
 | `EDITOR_MODE` | Post editor mode for compatibility testing. Use `default` normally or `non-iframe` to force the legacy non-iframe post editor where the selected WordPress version still supports it. |
 | `PHP_DISPLAY_ERRORS` | PHP error display for pre-WordPress/direct PHP diagnostics. Keep `Off` normally; temporarily set `On` only when required. WordPress requests still keep `WP_DEBUG_DISPLAY=false`. |
 | `WP_PROJECT_DIRECTORY` | WordPress project type: `plugins` or `themes`. |
@@ -42,6 +43,22 @@ Update at least the following values for the WordPress project being developed:
 | `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and `/workspaces/project`. |
 
 `WORDPRESS_URL` is derived by Compose from `WORDPRESS_HOST` and `WORDPRESS_PORT`. Do not add a separate `WORDPRESS_URL` value to an environment file. The same URL is used by WordPress and exposed as `WP_BASE_URL` for Playwright. See [WordPress URL configuration](../docs/wordpress-url.md) for the networking and canonical-URL design.
+
+### WordPress locale
+
+`WORDPRESS_LOCALE` controls the locale passed to `wp core install` when WordPress is not installed yet. The default is Japanese:
+
+```dotenv
+WORDPRESS_LOCALE=ja
+```
+
+For an English installation, set for example:
+
+```dotenv
+WORDPRESS_LOCALE=en_US
+```
+
+This setting is intentionally separate from `LOCALE`, which configures the container/OS locale. Changing `WORDPRESS_LOCALE` after WordPress has already been installed does not change the existing site's language and is not kept in sync automatically.
 
 ### PHP error display
 
