@@ -204,6 +204,8 @@ docker compose ... down --volumes
 - 完全初期化時に旧メールが残らないか。
 - Mailpit API または UI で手動削除する標準的な方法があるか。
 
+実測結果に基づき、Mailpit のメールを削除・初期化する方法を `docs/data-retention.md` または README に必ず文書化し、その方法で完全初期化後に旧メールが残らないことを検証する。
+
 保持期間や件数上限を追加する場合も、Mailpit のためだけに新しい永続 Volume を導入しないことを基本方針とする。
 
 ### 8. 実データを持ち込まない
@@ -273,13 +275,15 @@ README または `docs/data-retention.md` に次を明記する。
 - 通常停止と完全初期化を文書化。
 - 完全初期化時に対象 Compose プロジェクトと Named Volume を確認する手順を用意。
 - 外部プロジェクトの bind mount が削除されないことを確認。
+- 実データや機密性の高いデータを開発環境へ投入しない方針を README または `docs/data-retention.md` に記載。
 
 ### Phase 4: Mailpit と残りの一時データを確認
 
 実施内容:
 
 - Mailpit の保存・削除挙動を実測。
-- 必要なら手動削除方法を文書化。
+- 実測結果に基づくメールの削除・初期化方法を必ず文書化。
+- 文書化した方法で完全初期化後に Mailpit の旧メールが残らないことを確認。
 - PHP、Apache、WordPress 以外の主要な一時ログを確認。
 - 不要な長期保持があれば最小限の対策を追加。
 
@@ -305,6 +309,7 @@ README または `docs/data-retention.md` に次を明記する。
 
 ### Compose
 
+- `default` / `wp683` の双方で `docker compose ... config --quiet` が成功すること。
 - 通常の `docker compose down` で Named Volume が保持されること。
 - 完全初期化で対象環境の Named Volume だけが削除されること。
 - `WP_PROJECT_SOURCE_PATH` の bind mount 元が削除されないこと。
@@ -313,6 +318,17 @@ README または `docs/data-retention.md` に次を明記する。
 
 - `docs/data-retention.md` の保存場所・ライフサイクルが実測結果と一致すること。
 - Codex CLI / GitHub CLI / logcut / Mailpit の扱いが現在の構成と一致すること。
+- 実データや機密性の高いデータを開発環境へ投入しない方針が README または `docs/data-retention.md` に記載されていること。
+
+### Mailpit
+
+- 実測結果に基づく Mailpit のメール削除・初期化方法が文書化されていること。
+- 文書化した方法でメールを削除・初期化できること。
+- 完全初期化後に旧メールが残らないこと。
+
+### 両環境の利用確認
+
+- `default` / `wp683` の双方で、通常利用と必要なデバッグ確認が可能であること。
 
 ## Issue #25 の完了条件との対応
 
@@ -326,6 +342,10 @@ README または `docs/data-retention.md` に次を明記する。
 | 主要データの保存場所と保持方針を文書化 | Phase 3 / 4 |
 | 通常停止と完全初期化の違いを README へ記載 | Phase 3 |
 | Docker Volume を安全に削除する手順 | Phase 3 |
+| Mailpit のメールを削除・初期化する方法を明記 | Phase 4 |
+| 実データや機密性の高いデータを開発環境へ投入しない方針を記載 | Phase 3 |
+| `default` / `wp683` の両環境でデバッグと通常利用が可能 | Phase 1〜4 の各該当実装で確認 |
+| Compose 構成検証が成功 | Phase 1〜4 の各該当実装で確認 |
 
 ## 対象外
 
