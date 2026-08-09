@@ -29,6 +29,7 @@ Update at least the following values for the WordPress project being developed:
 | `PLAYWRIGHT_VERSION` | Playwright version used to install the managed Chromium browser and its runtime dependencies. |
 | `PLAYWRIGHT_ONLY_SHELL` | Set to `true` to install only Chromium headless shell, or `false` to keep the full Chromium installation. |
 | `WP_CLI_VERSION` | WP-CLI version installed during the development image build. |
+| `WP_CLI_SHA256` | Expected SHA-256 digest for the WP-CLI PHAR matching `WP_CLI_VERSION`. |
 | `XDEBUG_VERSION` | Xdebug version installed during the development image build. |
 | `CODEX_CLI_VERSION` | Codex CLI version installed during the development image build. |
 | `LOGCUT_VERSION` | logcut release version installed during the development image build. Specify the version without the `v` prefix. |
@@ -52,6 +53,8 @@ When the environment is switched back to `EDITOR_MODE=default`, the same marker 
 This compatibility switch applies to the post editor only. WordPress is moving toward always using the iframe editor, so `non-iframe` is intended only for testing versions that still provide the fallback.
 
 Composer is copied from the `composer:${COMPOSER_VERSION}` image into the WordPress development image. Use a valid Composer image tag, such as `2.8`, and rebuild the image after changing it.
+
+During the image build, the WP-CLI PHAR is checked against `WP_CLI_SHA256` before it is made executable. When `WP_CLI_VERSION` is updated, update `WP_CLI_SHA256` to the digest published for the matching release asset.
 
 During the image build, the matching amd64 or arm64 logcut release archive and `SHA256SUMS` are downloaded from GitHub. The archive is installed only after its checksum has been verified.
 
