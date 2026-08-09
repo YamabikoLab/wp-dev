@@ -38,6 +38,8 @@ define('WP_DEBUG_DISPLAY', false);
 
 したがって、WordPress の通常処理では画面表示を抑制していても、WordPress 初期化前、直接実行する PHP、起動時エラーなどは別途対策が必要である。
 
+また、`WP_DEBUG_DISPLAY=false` の場合は WordPress 初期化後に `display_errors` が無効化されるため、PHP 側の opt-in を有効にしても通常の WordPress リクエストへは反映されない。この挙動を安全側の境界として採用する。
+
 ### 永続データ
 
 現在の共有 Compose 定義で明示的に使用している Named Volume は次の 2 つである。
@@ -72,9 +74,11 @@ error_reporting = E_ALL
 
 エラー情報はログで確認できる状態を維持する。
 
-### 2. エラー表示は明示的な opt-in にする
+### 2. エラー表示は限定的な opt-in にする
 
-画面表示が必要な調査時だけ、一時的に PHP エラー表示を有効化できる仕組みを用意する。
+PHP エラー表示の opt-in は、WordPress 初期化前、直接実行する PHP、起動時エラーなど、WordPress が `display_errors` を上書きしない範囲だけを対象とする。
+
+通常の WordPress リクエストでは `WP_DEBUG_DISPLAY=false` を維持し、常に画面へ PHP エラーを表示しない。WordPress 内のエラー確認は `debug.log` などのログを利用する。
 
 候補は、Compose から渡す 1 個の明示的な環境変数で `display_errors` と `display_startup_errors` を同時に切り替える方法とする。
 
@@ -84,12 +88,21 @@ error_reporting = E_ALL
 
 - 変数未指定時は必ず `Off`。
 - `default` と `wp683` で同じ仕組みを使う。
+- opt-in の対象が WordPress 初期化前 / 直接実行 PHP に限定されることを文書化する。
 - 一時的に有効化する手順と、元へ戻す手順を README または focused doc に記載する。
 - WordPress の `WP_DEBUG_DISPLAY=false` は維持する。
+- WordPress 初期化後の通常ページでは、opt-in の有無にかかわらず PHP エラーが画面表示されないことを確認する。
 
-### 3. `debug.log` に明示的な上限を設ける
+### 3. `debug.log` に明示的な上限を設け、HTTP 公開可否も確認する
 
 `WP_DEBUG_LOG` を維持する場合、`wp-content/debug.log` を無制限に成長させない。
+
+あわせて、標準の `wp-content/debug.log` が HTTP 経由で取得可能かを実測する。取得可能な場合は、次のいずれかを採用する。
+
+- `WP_DEBUG_LOG` をドキュメントルート外の明示パスへ移す。
+- Web サーバー側で対象ログへのアクセスを拒否する。
+
+採用した保存場所とアクセス制御は、ローテーション設計および `docs/data-retention.md` に反映する。
 
 実装方式は次の条件を満たすものを選ぶ。
 
@@ -126,7 +139,7 @@ error_reporting = E_ALL
 
 | データ | 保存場所 | 永続化方式 | 通常停止後 | 完全初期化後 | 削除方法 | 注意事項 |
 | --- | --- | --- | --- | --- | --- | --- |
-| WordPress 本体・アップロード・`debug.log` | `wordpress_data` 内 | Named Volume | 保持 | 削除 | Compose 経由 | 実データを持ち込まない |
+| WordPress 本体・アップロード・`debug.log` | 実装後の `WP_DEBUG_LOG` 実パス / `wordpress_data` | Named Volume または採用したログ保存方式 | 保持 | 削除 | Compose 経由 | HTTP 公開可否を確認し、実データを持ち込まない |
 | MariaDB | `db_data` 内 | Named Volume | 保持 | 削除 | Compose 経由 | 本番 DB を原則投入しない |
 | Mailpit | 実装時に実測確認 | Named Volume なし | 実測結果を記載 | 削除されることを確認 | Mailpit / Compose | 実在メール・認証リンクを避ける |
 | Codex CLI | `/home/developer/.codex` | コンテナ領域 | ライフサイクルを記載 | 削除 | コンテナ再作成 | 認証情報を含む |
@@ -222,41 +235,46 @@ README または `docs/data-retention.md` に次を明記する。
 - `display_errors=Off`。
 - `display_startup_errors=Off`。
 - `log_errors=On` / `error_reporting=E_ALL` を維持。
-- 一時的な opt-in の方法を追加。
+- WordPress 初期化前 / 直接実行 PHP に限定した一時的な opt-in の方法を追加。
+- `WP_DEBUG_DISPLAY=false` は維持し、WordPress 通常リクエストでは常に非表示とする。
 - `default` / `wp683` で共通化。
 
-### Phase 2: WordPress `debug.log` の上限管理
+### Phase 2: WordPress `debug.log` の上限管理と公開範囲確認
 
 対象候補:
 
 - `.devcontainer/shared/`
 - `docker/compose.shared.yaml`
 - 必要に応じてログローテーション用設定・スクリプト
+- 必要に応じて Apache 側のアクセス制御
 - `docs/data-retention.md`
 
 実施内容:
 
 - `debug.log` の所有者・権限・実パスを確認。
+- `wp-content/debug.log` が HTTP 経由で取得できないかを `default` / `wp683` の両方で確認。
+- HTTP 取得可能な場合は、ドキュメントルート外への移動または Web サーバー側のアクセス拒否を実装。
+- 採用した `WP_DEBUG_LOG` の保存場所をローテーション設計と `docs/data-retention.md` に反映。
 - サイズベースの自動ローテーションを実装。
-- 長時間起動中にも上限が働くことを確認。
-- ログへ機密情報を残さない注意事項を文書化。
+- 世代数とサイズ上限を設定。
+- 長時間起動中にも機能することを確認。
 
-### Phase 3: データ保持一覧と安全な初期化
+### Phase 3: データ保持ポリシーと安全な初期化手順
 
 対象候補:
 
 - `docs/data-retention.md`
-- `README.md`
-- 必要に応じて `scripts/` 配下の安全確認付き初期化スクリプト
+- README
+- 必要に応じて完全初期化用スクリプト
 
 実施内容:
 
-- WordPress、MariaDB、Mailpit、Codex、GitHub CLI、logcut、PHP / Apache ログを棚卸し。
+- WordPress / MariaDB / Codex CLI / GitHub CLI / logcut / PHP / Apache の保存場所とライフサイクルを実測。
 - 通常停止と完全初期化を文書化。
-- 削除対象と削除後の影響を明示。
-- Compose プロジェクトを確認してから破壊的操作を実行する手順を追加。
+- 完全初期化時に対象 Compose プロジェクトと Named Volume を確認する手順を用意。
+- 外部プロジェクトの bind mount が削除されないことを確認。
 
-### Phase 4: Mailpit とその他一時データの保持方針を確定
+### Phase 4: Mailpit と残りの一時データを確認
 
 実施内容:
 
@@ -269,94 +287,57 @@ README または `docs/data-retention.md` に次を明記する。
 
 実装 PR ごとに、その PR に関係する範囲だけを検証する。
 
+### PHP / WordPress
+
+- opt-in 未指定時、`display_errors` / `display_startup_errors` が `Off` であること。
+- opt-in 有効時、WordPress 初期化前または直接実行 PHP では PHP エラー表示が有効になること。
+- opt-in 有効時でも、WordPress 初期化後の通常ページでは `WP_DEBUG_DISPLAY=false` により PHP エラーが画面表示されないこと。
+- `WP_DEBUG_LOG` が引き続き機能すること。
+
+### `debug.log`
+
+- `default` / `wp683` の双方で `debug.log` の実パスを確認する。
+- HTTP 経由でログを直接取得できないことを確認する。
+- 取得可能だった構成では、採用した対策後に HTTP アクセスが拒否されることを確認する。
+- ローテーションが指定サイズ付近で発生すること。
+- 世代数上限を超えた古いログが削除されること。
+- 所有者・権限が壊れないこと。
+
 ### Compose
 
-```bash
-docker compose --env-file environments/default.env -f .devcontainer/default/compose.yaml config --quiet
-docker compose --env-file environments/wp683.env -f .devcontainer/wp683/compose.yaml config --quiet
-```
+- 通常の `docker compose down` で Named Volume が保持されること。
+- 完全初期化で対象環境の Named Volume だけが削除されること。
+- `WP_PROJECT_SOURCE_PATH` の bind mount 元が削除されないこと。
 
-### PHP の既定値
+### データ保持
 
-両環境で少なくとも次を確認する。
-
-```bash
-php -r 'var_dump(ini_get("display_errors"), ini_get("display_startup_errors"), ini_get("log_errors"), error_reporting());'
-```
-
-期待値:
-
-- `display_errors`: Off
-- `display_startup_errors`: Off
-- `log_errors`: On
-- `error_reporting`: E_ALL 相当
-
-直接実行する PHP と WordPress 初期化前の PHP でエラーを発生させ、内部パスやスタックトレースがブラウザへ表示されないことも確認する。
-
-### opt-in デバッグ表示
-
-明示的な一時設定を有効化した環境でのみ PHP エラー表示が有効になることを確認する。
-
-通常設定へ戻した後、再度 Off になっていることを確認する。
-
-### WordPress `debug.log`
-
-- ログ出力先を確認する。
-- 設定した上限を超える量を書き込む。
-- 自動ローテーションまたは削除が起きることを確認する。
-- 世代数が上限を超えないことを確認する。
-- WordPress / Apache の書き込み権限を維持していることを確認する。
-
-### 通常停止と完全初期化
-
-破壊的操作を伴うため、実行前に対象 Compose プロジェクトと削除対象を確認する。
-
-確認内容:
-
-- 通常の `down` では `wordpress_data` / `db_data` が保持される。
-- 完全初期化では対象環境の Named Volume が削除される。
-- 別の Compose プロジェクトの Volume を削除しない。
-- `WP_PROJECT_SOURCE_PATH` の外部リポジトリは変更・削除されない。
-- 完全初期化後に旧 WordPress / MariaDB データが残らない。
-- Mailpit の旧メールが残らないことを、実測した保存方式に従って確認する。
-
-### リポジトリ検証
-
-```bash
-git diff --check
-```
-
-ドキュメントだけを変更する PR では、コンテナビルドを必須にしない。
+- `docs/data-retention.md` の保存場所・ライフサイクルが実測結果と一致すること。
+- Codex CLI / GitHub CLI / logcut / Mailpit の扱いが現在の構成と一致すること。
 
 ## Issue #25 の完了条件との対応
 
 | Issue #25 の完了条件 | 対応 Phase |
 | --- | --- |
 | `display_errors` / `display_startup_errors` を既定で無効化 | Phase 1 |
-| 必要時だけ PHP エラー表示を有効化 | Phase 1 |
+| 必要時だけ PHP エラー表示を有効化 | Phase 1。ただし WordPress 初期化前 / 直接実行 PHP に限定 |
 | `debug.log` に容量または期間の上限 | Phase 2 |
+| `debug.log` の HTTP 公開範囲を安全にする | Phase 2 |
 | 古い WordPress デバッグログを自動削除 / ローテーション | Phase 2 |
 | 主要データの保存場所と保持方針を文書化 | Phase 3 / 4 |
 | 通常停止と完全初期化の違いを README へ記載 | Phase 3 |
 | Docker Volume を安全に削除する手順 | Phase 3 |
-| Mailpit の削除・初期化方法 | Phase 4 |
-| 実データを持ち込まない方針 | Phase 3 |
-| `default` / `wp683` で利用可能 | 全 Phase |
-| Compose 構成検証が成功 | 構成変更を含む各 Phase |
 
 ## 対象外
 
-- 本番環境向けのログ収集・監視基盤。
-- 本番データの匿名化ツールそのもの。
+- 本番環境向けのログ集約基盤。
 - logcut 本体の保持仕様変更。
-- Codex CLI / GitHub CLI 本体の認証方式変更。
 - Issue #22 / #38 で解消済みの `codex_data` / `gh_config` Named Volume の再設計。
 - 外部プロジェクトのソースコード変更。
 
 ## 実装時の進め方
 
 1. Phase 1 から順に、責務の小さい PR として実装する。
-2. Phase 2 のローテーション方式は、常駐プロセス追加の要否を確認してから確定する。
+2. Phase 2 のローテーション方式は、常駐プロセス追加の要否と `debug.log` の HTTP 公開可否を確認してから確定する。
 3. Phase 3 で実測した保存場所・ライフサイクルを `docs/data-retention.md` の source of truth とする。
 4. Phase 4 で Mailpit と残りの一時データを埋め、Issue #25 の完了条件を最終確認する。
 5. 必要なら各 Phase を Issue #25 の子 Issue として切り出すが、重複する要件は親 Issue 側へ残さず参照関係を明確にする。
