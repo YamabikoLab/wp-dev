@@ -30,6 +30,8 @@ fi
 
 install -o developer -g developer -m 0700 -d /workspaces
 
+docker-ensure-installed.sh true
+
 mkdir -p \
     /var/www/html \
     "${MU_PLUGIN_TARGET_DIR}"
@@ -73,4 +75,34 @@ PHP;
     ' "${WORDPRESS_CONFIG_FILE}"
 fi
 
-exec docker-entrypoint.sh "$@"
+: "${WORDPRESS_URL:?WORDPRESS_URL is required}"
+: "${WORDPRESS_SITE_TITLE:?WORDPRESS_SITE_TITLE is required}"
+: "${WORDPRESS_ADMIN_USER:?WORDPRESS_ADMIN_USER is required}"
+: "${WORDPRESS_ADMIN_PASSWORD:?WORDPRESS_ADMIN_PASSWORD is required}"
+: "${WORDPRESS_ADMIN_EMAIL:?WORDPRESS_ADMIN_EMAIL is required}"
+
+wp_cli=(wp --allow-root --path=/var/www/html)
+
+if ! "${wp_cli[@]}" core is-installed >/dev/null 2>&1; then
+    "${wp_cli[@]}" core install \
+        --url="${WORDPRESS_URL}" \
+        --title="${WORDPRESS_SITE_TITLE}" \
+        --admin_user="${WORDPRESS_ADMIN_USER}" \
+        --admin_password="${WORDPRESS_ADMIN_PASSWORD}" \
+        --admin_email="${WORDPRESS_ADMIN_EMAIL}" \
+        --skip-email
+elif user_id="$("${wp_cli[@]}" user get "${WORDPRESS_ADMIN_USER}" --field=ID 2>/dev/null)"; then
+    "${wp_cli[@]}" user update "${user_id}" \
+        --user_pass="${WORDPRESS_ADMIN_PASSWORD}" \
+        --user_email="${WORDPRESS_ADMIN_EMAIL}" \
+        --role=administrator \
+        --skip-email
+else
+    "${wp_cli[@]}" user create \
+        "${WORDPRESS_ADMIN_USER}" \
+        "${WORDPRESS_ADMIN_EMAIL}" \
+        --user_pass="${WORDPRESS_ADMIN_PASSWORD}" \
+        --role=administrator
+fi
+
+exec "$@"
