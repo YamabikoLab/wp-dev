@@ -36,11 +36,22 @@ Update at least the following values for the WordPress project being developed:
 | `WORDPRESS_HOST` | Host name used by the canonical WordPress URL. |
 | `WORDPRESS_PORT` | WordPress port used by both the host URL and the additional Apache listener inside the Dev Container. |
 | `EDITOR_MODE` | Post editor mode for compatibility testing. Use `default` normally or `non-iframe` to force the legacy non-iframe post editor where the selected WordPress version still supports it. |
+| `PHP_DISPLAY_ERRORS` | PHP error display for pre-WordPress/direct PHP diagnostics. Keep `Off` normally; temporarily set `On` only when required. WordPress requests still keep `WP_DEBUG_DISPLAY=false`. |
 | `WP_PROJECT_DIRECTORY` | WordPress project type: `plugins` or `themes`. |
 | `WP_PROJECT_SLUG` | Directory name used under `wp-content/plugins` or `wp-content/themes`. |
 | `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and `/workspaces/project`. |
 
 `WORDPRESS_URL` is derived by Compose from `WORDPRESS_HOST` and `WORDPRESS_PORT`. Do not add a separate `WORDPRESS_URL` value to an environment file. The same URL is used by WordPress and exposed as `WP_BASE_URL` for Playwright. See [WordPress URL configuration](../docs/wordpress-url.md) for the networking and canonical-URL design.
+
+### PHP error display
+
+`PHP_DISPLAY_ERRORS=Off` is the safe default. PHP reads this environment value from the shared `php.ini` for both `display_errors` and `display_startup_errors`.
+
+Temporarily set it to `On` only when diagnosing errors before WordPress initialization, direct PHP execution, or startup errors, then recreate the target container. Restore it to `Off` after diagnosis.
+
+WordPress normal requests keep `WP_DEBUG_DISPLAY=false`, so this opt-in is intentionally not a switch for displaying WordPress runtime errors in the browser.
+
+See [Development data retention and reset](../docs/data-retention.md) for the surrounding data-handling policy.
 
 ### Editor mode
 

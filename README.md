@@ -8,6 +8,8 @@ WordPressプラグイン・テーマ開発用の共通Dev Container環境です�
 
 WordPressの正規URLと、ホスト・Dev Container・Playwrightからのアクセス方法については、[WordPress URL 構成](docs/wordpress-url.md)を参照してください。
 
+開発データの取り扱い、PHPエラー表示、保存場所、削除・初期化方法については、[開発データの保持と初期化](docs/data-retention.md)を参照してください。
+
 ## 必要なもの
 
 - Docker
@@ -68,6 +70,7 @@ WP_PROJECT_DIRECTORY=themes
 | `WORDPRESS_HOST`         | WordPressの正規URLに使用するホスト名                         |
 | `WORDPRESS_PORT`         | WordPressの公開ポート                                       |
 | `MAILPIT_WEB_PORT`       | MailpitのWeb UIを公開するホスト側ポート                     |
+| `PHP_DISPLAY_ERRORS`     | PHPエラー画面表示。通常は`Off`、限定的な診断時のみ`On`      |
 | `LOCAL_UID`              | Dev Containerの`developer`ユーザーに割り当てるUID           |
 | `LOCAL_GID`              | Dev Containerの`developer`ユーザーに割り当てるGID           |
 | `WP_PROJECT_DIRECTORY`   | `plugins`または`themes`                                     |
@@ -75,6 +78,8 @@ WP_PROJECT_DIRECTORY=themes
 | `WP_PROJECT_SOURCE_PATH` | 開発対象リポジトリへの相対パス                              |
 
 `WORDPRESS_URL`は`WORDPRESS_HOST`と`WORDPRESS_PORT`からDocker Composeが導出します。環境設定ファイルへ個別に設定しないでください。
+
+`PHP_DISPLAY_ERRORS`は既定で`Off`です。WordPress初期化前、直接実行PHP、起動時エラーの診断時だけ一時的に`On`へ変更し、対象コンテナを再作成してください。WordPress通常リクエストでは`WP_DEBUG_DISPLAY=false`を維持するため、この設定を`On`にしてもWordPress初期化後の通常ページへPHPエラーを表示する用途には使用しません。
 
 ### 3. Dev Containerを開く
 
@@ -123,6 +128,8 @@ Web UIのポートを変更する場合は、使用する環境設定ファイ�
 送信元アドレス: wordpress@example.test
 送信者名: WordPress Development
 ```
+
+Mailpitのメールだけを削除する場合はWeb UIの`Delete all`を使用できます。Mailpitは永続Volumeを使用していないため、コンテナを削除・再作成すると旧メールは引き継がれません。詳しくは[開発データの保持と初期化](docs/data-retention.md)を参照してください。
 
 ## 開発ユーザーとCLI認証情報
 
@@ -195,18 +202,18 @@ WordPress側のマウントは読み取り専用です。WordPress、Apache、PH
 メールアドレス: admin@example.test
 ```
 
-これらはローカル開発専用です。本番環境では使用しないでください。
+これらはローカル開発専用です。本番環境では使用しないでください。本番DB、本番アップロード、実在する個人情報、実認証情報は原則として開発環境へ持ち込まないでください。
 
 ## データの永続化
 
-次のデータはDockerボリュームへ保存されます。
+次のデータはDockerのNamed Volumeへ保存されます。
 
-- WordPress本体とアップロードデータ
-- MariaDBのデータ
+- WordPress本体、アップロード、`wp-content/debug.log`: `wordpress_data`
+- MariaDB: `db_data`
 
-CodexとGitHub CLIの認証情報は永続化しません。
+通常の`docker compose down`ではこれらのNamed Volumeを保持します。CodexとGitHub CLIの認証情報はNamed Volumeへ永続化しません。Mailpitも永続Volumeを使用しません。
 
-環境を完全に初期化する場合は、対象のComposeプロジェクトに紐づくボリュームも削除してください。
+保存場所、データごとのライフサイクル、Mailpitの削除方法については[開発データの保持と初期化](docs/data-retention.md)を参照してください。
 
 ## 環境の停止
 
@@ -230,4 +237,28 @@ docker compose \
   down
 ```
 
-ボリュームも削除して初期化する場合は、対象コマンドに`--volumes`を追加します。
+### 完全初期化
+
+`down --volumes`はWordPressとMariaDBのNamed Volumeを削除する破壊的操作です。実行前に、対象Composeプロジェクトが正しいことを確認してください。
+
+`default`の場合:
+
+```bash
+docker compose \
+  --env-file environments/default.env \
+  -f .devcontainer/default/compose.yaml \
+  ps
+```
+
+対象が正しいことを確認した後に実行します。
+
+```bash
+docker compose \
+  --env-file environments/default.env \
+  -f .devcontainer/default/compose.yaml \
+  down --volumes
+```
+
+`wp683`では`environments/wp683.env`と`.devcontainer/wp683/compose.yaml`を使用してください。
+
+完全初期化では対象Composeプロジェクトの`wordpress_data`と`db_data`が削除されます。`WP_PROJECT_SOURCE_PATH`で指定したホスト側のbind mount元は削除されません。また、バックアップやホストへ別途コピーしたデータは残る可能性があります。
