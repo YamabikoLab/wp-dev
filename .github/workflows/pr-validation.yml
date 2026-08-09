@@ -26,8 +26,9 @@ jobs:
 
       - name: Validate shell syntax
         run: |
-          bash -n .devcontainer/shared/scripts/*.sh
-          bash -n .devcontainer/shared/scripts/*.bash
+          for script in .devcontainer/shared/scripts/*.sh .devcontainer/shared/scripts/*.bash; do
+            bash -n "$script"
+          done
 
       - name: Prepare Docker Compose validation environments
         run: |
