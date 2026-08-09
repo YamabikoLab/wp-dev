@@ -24,6 +24,12 @@ jobs:
           echo "::error::Select the PR branch when running this workflow."
           exit 1
 
+      - name: Validate shell syntax
+        run: |
+          for script in .devcontainer/shared/scripts/*.sh .devcontainer/shared/scripts/*.bash; do
+            bash -n "$script"
+          done
+
       - name: Prepare Docker Compose validation environments
         run: |
           mkdir -p .ci-project
