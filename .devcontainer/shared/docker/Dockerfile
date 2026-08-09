@@ -9,6 +9,7 @@ ARG NODE_VERSION
 ARG PLAYWRIGHT_VERSION
 ARG PLAYWRIGHT_ONLY_SHELL=false
 ARG WP_CLI_VERSION
+ARG WP_CLI_SHA256
 ARG XDEBUG_VERSION
 ARG CODEX_CLI_VERSION
 ARG LOGCUT_VERSION
@@ -93,6 +94,7 @@ RUN set -eux; \
     curl -fsSL \
         "https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar" \
         -o /usr/local/bin/wp; \
+    printf '%s  %s\n' "${WP_CLI_SHA256}" /usr/local/bin/wp | sha256sum -c -; \
     chmod +x /usr/local/bin/wp; \
     wp --allow-root --version > /dev/null
 
