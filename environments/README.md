@@ -34,11 +34,22 @@ Update at least the following values for the WordPress project being developed:
 | `LOGCUT_VERSION` | logcut release version installed during the development image build. Specify the version without the `v` prefix. |
 | `WORDPRESS_HOST` | Host name used by the canonical WordPress URL. |
 | `WORDPRESS_PORT` | WordPress port used by both the host URL and the additional Apache listener inside the Dev Container. |
+| `EDITOR_MODE` | Post editor mode for compatibility testing. Use `default` normally or `non-iframe` to force the legacy non-iframe post editor where the selected WordPress version still supports it. |
 | `WP_PROJECT_DIRECTORY` | WordPress project type: `plugins` or `themes`. |
 | `WP_PROJECT_SLUG` | Directory name used under `wp-content/plugins` or `wp-content/themes`. |
 | `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and `/workspaces/project`. |
 
 `WORDPRESS_URL` is derived by Compose from `WORDPRESS_HOST` and `WORDPRESS_PORT`. Do not add a separate `WORDPRESS_URL` value to an environment file. The same URL is used by WordPress and exposed as `WP_BASE_URL` for Playwright. See [WordPress URL configuration](../docs/wordpress-url.md) for the networking and canonical-URL design.
+
+### Editor mode
+
+`EDITOR_MODE=default` leaves WordPress editor selection unchanged.
+
+`EDITOR_MODE=non-iframe` registers a hidden `wp-dev/editor-mode-marker` block with Block API version 2. In WordPress 6.8, registering that lower-versioned block is enough to select the non-iframe post editor. In WordPress 7.0, the editor checks blocks actually present in the post, so wp-dev automatically inserts the marker when the post editor opens. The marker renders no frontend output and is hidden from the inserter.
+
+When the environment is switched back to `EDITOR_MODE=default`, the same marker is registered as Block API version 3. Existing posts containing the marker therefore return to WordPress's normal iframe decision without requiring the marker to be removed.
+
+This compatibility switch applies to the post editor only. WordPress is moving toward always using the iframe editor, so `non-iframe` is intended only for testing versions that still provide the fallback.
 
 Composer is copied from the `composer:${COMPOSER_VERSION}` image into the WordPress development image. Use a valid Composer image tag, such as `2.8`, and rebuild the image after changing it.
 

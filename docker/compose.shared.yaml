@@ -22,6 +22,7 @@ services:
     environment:
       TZ: ${TZ:-Asia/Tokyo}
       LANG: ${LOCALE:-ja_JP.UTF-8}
+      EDITOR_MODE: ${EDITOR_MODE:-default}
       WORDPRESS_HOST: ${WORDPRESS_HOST:-127.0.0.1}
       WORDPRESS_PORT: ${WORDPRESS_PORT:?WORDPRESS_PORT is required}
       WORDPRESS_URL: http://${WORDPRESS_HOST:-127.0.0.1}:${WORDPRESS_PORT:?WORDPRESS_PORT is required}
