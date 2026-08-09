@@ -63,6 +63,7 @@ WP_PROJECT_DIRECTORY=themes
 | `NODE_VERSION`           | 開発コンテナへインストールするNode.jsのバージョン           |
 | `PLAYWRIGHT_VERSION`     | Chromiumのインストールに使用するPlaywrightのバージョン      |
 | `WP_CLI_VERSION`         | 開発コンテナへインストールするWP-CLIのバージョン            |
+| `WP_CLI_SHA256`          | WP-CLI PHAR の検証に使用するSHA-256                          |
 | `XDEBUG_VERSION`         | 開発コンテナへインストールするXdebugのバージョン            |
 | `CODEX_CLI_VERSION`      | 開発コンテナへインストールするCodex CLIのバージョン         |
 | `LOGCUT_VERSION`         | 開発コンテナへインストールするlogcutのバージョン            |
