@@ -107,4 +107,52 @@ else
         --role=administrator
 fi
 
+case "${MCP_ADAPTER_ENABLED:-false}" in
+    true)
+        : "${MCP_ADAPTER_VERSION:?MCP_ADAPTER_VERSION is required when MCP_ADAPTER_ENABLED=true}"
+        : "${MCP_ADAPTER_SHA256:?MCP_ADAPTER_SHA256 is required when MCP_ADAPTER_ENABLED=true}"
+
+        if [[ ! "${MCP_ADAPTER_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            printf 'Invalid MCP_ADAPTER_VERSION: %s\n' "${MCP_ADAPTER_VERSION}" >&2
+            exit 1
+        fi
+
+        if [[ ! "${MCP_ADAPTER_SHA256}" =~ ^[0-9a-fA-F]{64}$ ]]; then
+            printf 'Invalid MCP_ADAPTER_SHA256\n' >&2
+            exit 1
+        fi
+
+        wordpress_version="$("${wp_cli[@]}" core version)"
+        if ! php -r 'exit(version_compare($argv[1], "6.9", ">=") ? 0 : 1);' "${wordpress_version}"; then
+            printf 'MCP Adapter requires WordPress 6.9 or later; skipping on WordPress %s.\n' "${wordpress_version}" >&2
+        else
+            installed_version="$("${wp_cli[@]}" plugin get mcp-adapter --field=version 2>/dev/null || true)"
+
+            if [[ "${installed_version}" != "${MCP_ADAPTER_VERSION}" ]]; then
+                mcp_adapter_zip="$(mktemp /tmp/mcp-adapter.XXXXXX.zip)"
+                trap 'rm -f "${mcp_adapter_zip:-}"' EXIT
+
+                curl -fsSL \
+                    "https://github.com/WordPress/mcp-adapter/releases/download/v${MCP_ADAPTER_VERSION}/mcp-adapter.zip" \
+                    -o "${mcp_adapter_zip}"
+                printf '%s  %s\n' "${MCP_ADAPTER_SHA256}" "${mcp_adapter_zip}" | sha256sum -c -
+                "${wp_cli[@]}" plugin install "${mcp_adapter_zip}" --force
+
+                rm -f "${mcp_adapter_zip}"
+                trap - EXIT
+            fi
+
+            if ! "${wp_cli[@]}" plugin is-active mcp-adapter; then
+                "${wp_cli[@]}" plugin activate mcp-adapter
+            fi
+        fi
+        ;;
+    false)
+        ;;
+    *)
+        printf 'MCP_ADAPTER_ENABLED must be true or false: %s\n' "${MCP_ADAPTER_ENABLED}" >&2
+        exit 1
+        ;;
+esac
+
 exec "$@"
