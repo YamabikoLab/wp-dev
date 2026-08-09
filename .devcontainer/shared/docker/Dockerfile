@@ -20,16 +20,6 @@ ARG TARGETARCH
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
-RUN groupadd --gid "${LOCAL_GID}" developer \
-    && useradd --uid "${LOCAL_UID}" --gid "${LOCAL_GID}" --create-home --shell /bin/bash developer \
-    && install -o developer -g developer -m 0700 -d \
-        /home/developer \
-        /home/developer/.vscode-server \
-        /home/developer/.codex \
-        /home/developer/.config \
-        /home/developer/.config/gh \
-    && install -m 0755 -d /usr/local/share/codex-hooks /usr/local/share/wp-dev/apache
-
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
@@ -152,6 +142,16 @@ RUN case "${LOCALE}" in \
 
 ENV TZ=${TZ} \
     LANG=${LOCALE}
+
+RUN groupadd --gid "${LOCAL_GID}" developer \
+    && useradd --uid "${LOCAL_UID}" --gid "${LOCAL_GID}" --create-home --shell /bin/bash developer \
+    && install -o developer -g developer -m 0700 -d \
+        /home/developer \
+        /home/developer/.vscode-server \
+        /home/developer/.codex \
+        /home/developer/.config \
+        /home/developer/.config/gh \
+    && install -m 0755 -d /usr/local/share/codex-hooks /usr/local/share/wp-dev/apache
 
 COPY docker/wordpress/mu-plugins \
     /usr/src/wordpress/wp-content/mu-plugins
