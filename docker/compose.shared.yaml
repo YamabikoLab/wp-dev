@@ -6,9 +6,11 @@ services:
       context: ..
       dockerfile: .devcontainer/shared/docker/Dockerfile
       args:
+        COMPOSER_VERSION: ${COMPOSER_VERSION:?COMPOSER_VERSION is required}
         WORDPRESS_IMAGE_TAG: ${WORDPRESS_IMAGE_TAG:?WORDPRESS_IMAGE_TAG is required}
         NODE_VERSION: ${NODE_VERSION:?NODE_VERSION is required}
         PLAYWRIGHT_VERSION: ${PLAYWRIGHT_VERSION:?PLAYWRIGHT_VERSION is required}
+        PLAYWRIGHT_ONLY_SHELL: ${PLAYWRIGHT_ONLY_SHELL:-false}
         WP_CLI_VERSION: ${WP_CLI_VERSION:?WP_CLI_VERSION is required}
         XDEBUG_VERSION: ${XDEBUG_VERSION:?XDEBUG_VERSION is required}
         CODEX_CLI_VERSION: ${CODEX_CLI_VERSION:?CODEX_CLI_VERSION is required}
