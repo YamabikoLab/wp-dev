@@ -12,3 +12,88 @@
     "vscode": {
       "extensions": [
         "xdebug.php-debug",
+        "bmewburn.vscode-intelephense-client",
+        "dbaeumer.vscode-eslint",
+        "stylelint.vscode-stylelint",
+        "esbenp.prettier-vscode",
+        "ms-playwright.playwright"
+      ],
+      "settings": {
+        "[php]": {
+          "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
+          "editor.formatOnSave": false
+        },
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+          }
+        },
+        "[javascriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+          }
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+          }
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+          }
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[jsonc]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[css]": {
+          "editor.formatOnSave": false,
+          "editor.codeActionsOnSave": {
+            "source.fixAll.stylelint": "explicit"
+          }
+        },
+        "[scss]": {
+          "editor.formatOnSave": false,
+          "editor.codeActionsOnSave": {
+            "source.fixAll.stylelint": "explicit"
+          }
+        },
+        "[yaml]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[markdown]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "stylelint.validate": [
+          "css",
+          "scss"
+        ],
+        "editor.formatOnSave": true,
+        "files.eol": "\n",
+        "files.exclude": {
+          "**/.git": true,
+          "**/node_modules": true
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "php.validate.enable": false,
+        "intelephense.environment.phpVersion": "8.3",
+        "eslint.validate": [
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact"
+        ]
+      }
+    }
+  },
+  "postCreateCommand": "bash /workspaces/wp-dev/.devcontainer/shared/scripts/shell-setup.sh",
+  "postAttachCommand": "bash /workspaces/wp-dev/.devcontainer/shared/scripts/codex-vscode-extension.sh",
+  "remoteUser": "developer"
+}
