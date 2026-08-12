@@ -11,6 +11,7 @@ ARG PLAYWRIGHT_ONLY_SHELL=false
 ARG WP_CLI_VERSION
 ARG WP_CLI_SHA256
 ARG XDEBUG_VERSION
+ARG CODEX_ENABLED=false
 ARG CODEX_CLI_VERSION
 ARG LOGCUT_VERSION
 ARG LOCAL_UID=1000
@@ -20,6 +21,7 @@ ARG TZ=Asia/Tokyo
 ARG TARGETARCH
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+ENV CODEX_ENABLED=${CODEX_ENABLED}
 
 RUN set -eux; \
     apt-get update; \
@@ -128,8 +130,23 @@ RUN set -eux; \
     logcut --version > /dev/null
 
 RUN --mount=type=cache,target=/root/.npm \
-    npm install --global "@openai/codex@${CODEX_CLI_VERSION}" \
-    && codex --version > /dev/null
+    set -eux; \
+    case "${CODEX_ENABLED}" in \
+        true) \
+            if [ -z "${CODEX_CLI_VERSION}" ]; then \
+                echo 'CODEX_CLI_VERSION is required when CODEX_ENABLED=true' >&2; \
+                exit 1; \
+            fi; \
+            npm install --global "@openai/codex@${CODEX_CLI_VERSION}"; \
+            codex --version > /dev/null \
+            ;; \
+        false) \
+            ;; \
+        *) \
+            echo "CODEX_ENABLED must be true or false: ${CODEX_ENABLED}" >&2; \
+            exit 1 \
+            ;; \
+    esac
 
 COPY --from=composer-source /usr/bin/composer /usr/local/bin/composer
 RUN composer --version > /dev/null
@@ -150,10 +167,13 @@ RUN groupadd --gid "${LOCAL_GID}" developer \
     && install -o developer -g developer -m 0700 -d \
         /home/developer \
         /home/developer/.vscode-server \
-        /home/developer/.codex \
         /home/developer/.config \
         /home/developer/.config/gh \
-    && install -m 0755 -d /usr/local/share/codex-hooks /usr/local/share/wp-dev/apache
+    && install -m 0755 -d /usr/local/share/wp-dev/apache \
+    && if [ "${CODEX_ENABLED}" = true ]; then \
+        install -o developer -g developer -m 0700 -d /home/developer/.codex; \
+        install -m 0755 -d /usr/local/share/codex-hooks; \
+    fi
 
 COPY docker/wordpress/mu-plugins \
     /usr/src/wordpress/wp-content/mu-plugins
@@ -161,9 +181,15 @@ COPY .devcontainer/shared/apache/wordpress-url.conf.template \
     /usr/local/share/wp-dev/apache/wordpress-url.conf.template
 
 COPY --chmod=0755 .devcontainer/shared/scripts/terminal-bell.sh \
-    /usr/local/share/codex-hooks/terminal-bell.sh
+    /tmp/codex-hooks/terminal-bell.sh
 COPY .devcontainer/shared/hooks/hooks.json \
-    /usr/local/share/codex-hooks/hooks.json
+    /tmp/codex-hooks/hooks.json
+RUN set -eux; \
+    if [ "${CODEX_ENABLED}" = true ]; then \
+        install -m 0755 /tmp/codex-hooks/terminal-bell.sh /usr/local/share/codex-hooks/terminal-bell.sh; \
+        install -m 0644 /tmp/codex-hooks/hooks.json /usr/local/share/codex-hooks/hooks.json; \
+    fi; \
+    rm -rf /tmp/codex-hooks
 
 COPY --chmod=0755 .devcontainer/shared/scripts/devcontainer-entrypoint.sh \
     /usr/local/bin/devcontainer-entrypoint
