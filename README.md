@@ -20,6 +20,12 @@ WordPressの正規URLと、ホスト・Dev Container・Playwrightからのアク
 
 ### 1. リポジトリを配置する
 
+新規に利用する場合は、まず `wp-dev` を HTTPS で clone します。
+
+```bash
+git clone https://github.com/YamabikoLab/wp-dev.git
+```
+
 `wp-dev`と開発対象のリポジトリを、同じ親ディレクトリなど相対パスで参照できる場所へ配置します。
 
 ```text
@@ -265,3 +271,9 @@ docker compose \
 `wp683`では`environments/wp683.env`と`.devcontainer/wp683/compose.yaml`を使用してください。
 
 完全初期化では対象Composeプロジェクトの`wordpress_data`と`db_data`が削除されます。`WP_PROJECT_SOURCE_PATH`で指定したホスト側のbind mount元は削除されません。また、バックアップやホストへ別途コピーしたデータは残る可能性があります。
+
+## Issue・セキュリティ報告
+
+不具合報告や機能要望については、[CONTRIBUTING.md](CONTRIBUTING.md)を参照してください。
+
+セキュリティ上の問題は公開Issueに投稿せず、[SECURITY.md](SECURITY.md)の手順に従って非公開で報告してください。
