@@ -1,0 +1,66 @@
+name: 不具合報告
+description: wp-dev 自体の不具合を報告する
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ご報告ありがとうございます。
+
+        主なサポート範囲は `CONTRIBUTING.md` を確認してください。
+        ログや設定を共有する場合は、パスワード、トークン、その他の機密情報を含めないでください。
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      description: 問題を再現するための手順を記載してください。
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待した結果
+      description: 本来どのようになることを期待していたか記載してください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 実際に起きた結果
+      description: 実際に起きたことを記載してください。
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: wp-dev の環境
+      description: 使用している環境を選択してください。
+      options:
+        - default
+        - wp683
+        - その他
+    validations:
+      required: true
+
+  - type: input
+    id: host-os
+    attributes:
+      label: ホスト OS
+      description: 例: Windows 11 + WSL2、Ubuntu 24.04、macOS など
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 関連するエラーやログ
+      description: 必要に応じて貼り付けてください。機密情報は含めないでください。
+      render: shell
