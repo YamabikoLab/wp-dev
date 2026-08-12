@@ -15,8 +15,9 @@ find_code_server() {
             -path '*/bin/code-server' \
             -type f \
             -perm -u+x \
-            -print \
-            -quit
+            -printf '%T@ %p\n' | \
+            sort -nr | \
+            sed -n '1s/^[^ ]* //p'
     )"
 
     if [ -z "${code_server}" ]; then
