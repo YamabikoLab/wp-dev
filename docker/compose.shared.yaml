@@ -14,7 +14,7 @@ services:
         WP_CLI_VERSION: ${WP_CLI_VERSION:?WP_CLI_VERSION is required}
         WP_CLI_SHA256: ${WP_CLI_SHA256:?WP_CLI_SHA256 is required}
         XDEBUG_VERSION: ${XDEBUG_VERSION:?XDEBUG_VERSION is required}
-        CODEX_ENABLED: ${CODEX_ENABLED:-false}
+        CODEX_ENABLED: ${CODEX_ENABLED-false}
         CODEX_CLI_VERSION: ${CODEX_CLI_VERSION:-}
         LOGCUT_VERSION: ${LOGCUT_VERSION:?LOGCUT_VERSION is required}
         LOCAL_UID: ${LOCAL_UID:-1000}
@@ -24,7 +24,7 @@ services:
     environment:
       TZ: ${TZ:-Asia/Tokyo}
       LANG: ${LOCALE:-ja_JP.UTF-8}
-      CODEX_ENABLED: ${CODEX_ENABLED:-false}
+      CODEX_ENABLED: ${CODEX_ENABLED-false}
       EDITOR_MODE: ${EDITOR_MODE:-default}
       PHP_DISPLAY_ERRORS: ${PHP_DISPLAY_ERRORS:-Off}
       WORDPRESS_HOST: ${WORDPRESS_HOST:-127.0.0.1}
