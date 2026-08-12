@@ -1,0 +1,29 @@
+name: 機能要望
+description: wp-dev の改善を提案する
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ご提案ありがとうございます。
+        機能要望は受け付けていますが、実装を保証するものではありません。
+        実装方法だけでなく、用途や背景が分かるように記載してください。
+  - type: textarea
+    id: use-case
+    attributes:
+      label: 用途・背景
+      description: どのような場面で改善が必要かを記載してください。
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 希望する改善
+      description: どのようになると使いやすいかを記載してください。
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 補足
+      description: 関連情報や参考資料などがあれば記載してください。
