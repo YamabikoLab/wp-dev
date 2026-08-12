@@ -11,7 +11,7 @@ OLD_SOURCE_LINE="source ${SCRIPT_DIR}/${LEGACY_BASHRC_BASENAME}"
 CODEX_HOME="${CODEX_HOME:-${HOME}/.codex}"
 GH_CONFIG_DIR="${GH_CONFIG_DIR:-${HOME}/.config/gh}"
 
-case "${CODEX_ENABLED:-false}" in
+case "${CODEX_ENABLED-false}" in
     true)
         install -d -m 0700 "${CODEX_HOME}" "${GH_CONFIG_DIR}"
         install -m 0600 /usr/local/share/codex-hooks/hooks.json "${CODEX_HOME}/hooks.json"
