@@ -71,7 +71,8 @@ WP_PROJECT_DIRECTORY=themes
 | `WP_CLI_VERSION`         | 開発コンテナへインストールするWP-CLIのバージョン            |
 | `WP_CLI_SHA256`          | WP-CLI PHAR の検証に使用するSHA-256                          |
 | `XDEBUG_VERSION`         | 開発コンテナへインストールするXdebugのバージョン            |
-| `CODEX_CLI_VERSION`      | 開発コンテナへインストールするCodex CLIのバージョン         |
+| `CODEX_ENABLED`          | Codex連携。既定は`false`、`true`で有効化                    |
+| `CODEX_CLI_VERSION`      | Codex有効時にインストールするCodex CLIのバージョン          |
 | `LOGCUT_VERSION`         | 開発コンテナへインストールするlogcutのバージョン            |
 | `WORDPRESS_HOST`         | WordPressの正規URLに使用するホスト名                         |
 | `WORDPRESS_PORT`         | WordPressの公開ポート                                       |
@@ -83,6 +84,14 @@ WP_PROJECT_DIRECTORY=themes
 | `WP_PROJECT_DIRECTORY`   | `plugins`または`themes`                                     |
 | `WP_PROJECT_SLUG`        | WordPress内で使用するプラグインまたはテーマのディレクトリ名 |
 | `WP_PROJECT_SOURCE_PATH` | 開発対象リポジトリへの相対パス                              |
+
+Codexはオプション機能で、既定では無効です。利用する場合は環境設定ファイルで次のように変更し、Dev Containerを再ビルドしてください。
+
+```dotenv
+CODEX_ENABLED=true
+```
+
+有効時のみCodex CLI、Codex hooks、TTY記録、OpenAIのVS Code拡張が導入・初期化されます。`CODEX_ENABLED`は`true`または`false`のみ指定できます。Codex CLIのバージョンは`CODEX_CLI_VERSION`で固定します。
 
 `WORDPRESS_URL`は`WORDPRESS_HOST`と`WORDPRESS_PORT`からDocker Composeが導出します。環境設定ファイルへ個別に設定しないでください。
 
@@ -142,20 +151,13 @@ Mailpitのメールだけを削除する場合はWeb UIの`Delete all`を使用�
 
 ## 開発ユーザーとCLI認証情報
 
-VS Code、Git、npm、Composer、WP-CLI、Codex CLI、GitHub CLIなどの開発操作は`developer`ユーザーで実行します。
+VS Code、Git、npm、Composer、WP-CLI、GitHub CLIなどの開発操作は`developer`ユーザーで実行します。Codexを有効にした場合はCodex CLIも`developer`ユーザーで実行します。
 
-CodexとGitHub CLIの認証情報は次の`developer`専用領域へ保存されます。
+GitHub CLIの認証情報は`/home/developer/.config/gh`へ保存されます。Codex有効時は、Codexの設定・認証情報を`/home/developer/.codex`へ保存します。これらは`developer`だけがアクセスできる権限で作成され、WordPress/PHPの`www-data`から読み取らせません。
 
-```text
-/home/developer/.codex
-/home/developer/.config/gh
-```
+CLI認証情報用のDockerボリュームは使用しません。Dev Containerまたはコンテナを再作成すると認証情報は失われるため、必要に応じてGitHub CLIと、有効化している場合はCodex CLIを再認証してください。
 
-これらのディレクトリは`developer`だけがアクセスできる権限で作成されます。WordPress/PHPの`www-data`から認証情報を読み取らせないためです。
-
-CLI認証情報用のDockerボリュームは使用しません。Dev Containerまたはコンテナを再作成すると認証情報は失われるため、必要に応じてCodex CLIとGitHub CLIを再認証してください。
-
-通常のCodex起動には`codex`コマンドを使用します。
+Codex有効時は`codex`コマンドで起動できます。
 
 ## 構成の検証
 
@@ -169,8 +171,13 @@ Dev Container内では、次のコマンドで実行ユーザーと開発ツー�
 ```bash
 whoami
 id
-codex --version
 gh auth status
+```
+
+Codexを有効にした場合は、次も確認できます。
+
+```bash
+codex --version
 ```
 
 `wp683`のコンテナ内では、次のコマンドでバージョンを確認できます。
@@ -220,7 +227,7 @@ WordPress側のマウントは読み取り専用です。WordPress、Apache、PH
 - WordPress本体、アップロード、`wp-content/debug.log`: `wordpress_data`
 - MariaDB: `db_data`
 
-通常の`docker compose down`ではこれらのNamed Volumeを保持します。CodexとGitHub CLIの認証情報はNamed Volumeへ永続化しません。Mailpitも永続Volumeを使用しません。
+通常の`docker compose down`ではこれらのNamed Volumeを保持します。GitHub CLIの認証情報はNamed Volumeへ永続化しません。Codex有効時の設定・認証情報もNamed Volumeへ永続化しません。Mailpitも永続Volumeを使用しません。
 
 保存場所、データごとのライフサイクル、Mailpitの削除方法については[開発データの保持と初期化](docs/data-retention.md)を参照してください。
 
