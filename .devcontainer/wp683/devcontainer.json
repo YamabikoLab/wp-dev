@@ -94,5 +94,6 @@
     }
   },
   "postCreateCommand": "bash /workspaces/wp-dev/.devcontainer/shared/scripts/shell-setup.sh",
+  "postAttachCommand": "bash /workspaces/wp-dev/.devcontainer/shared/scripts/codex-vscode-extension.sh",
   "remoteUser": "developer"
 }
