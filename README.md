@@ -4,7 +4,7 @@ WordPressプラグイン・テーマ開発用の共通Dev Container環境です�
 
 開発対象のリポジトリを外部からマウントし、WordPress、MariaDB、PHP、WP-CLIなどを含む開発環境を提供します。開発環境と製品コードを分離できるため、複数のWordPressプロジェクトで同じ環境を再利用できます。
 
-<img width="1448" height="1086" alt="wp-dev-overview" src="https://github.com/user-attachments/assets/2a422f72-5d27-4883-9441-0ba5b6e32510" />
+<img width="1491" height="1055" alt="wp-dev-overview" src="https://github.com/user-attachments/assets/2cd564ba-4ac2-424a-af8f-3dae05259140" />
 
 WordPressの正規URLと、ホスト・Dev Container・Playwrightからのアクセス方法については、[WordPress URL 構成](docs/wordpress-url.md)を参照してください。
 
