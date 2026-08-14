@@ -37,5 +37,5 @@ cduploads() {
 
 # VS Code統合ターミナルのTTYをCodexフック用に記録する
 if [[ "${CODEX_ENABLED:-false}" == "true" ]] && [[ $- == *i* ]] && tty -s; then
-    tty > "${CODEX_HOME:-$HOME/.codex}/vscode-terminal"
+  tty > "${CODEX_HOME:-$HOME/.codex}/vscode-terminal"
 fi
