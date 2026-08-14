@@ -53,9 +53,11 @@ Codex support is optional and disabled by default:
 CODEX_ENABLED=false
 ```
 
-Set `CODEX_ENABLED=true` and rebuild the Dev Container to enable it. When enabled, wp-dev installs the pinned `CODEX_CLI_VERSION`, initializes `/home/developer/.codex`, installs the Codex hooks, records the VS Code terminal TTY for the notification hook, and installs the `openai.chatgpt` VS Code extension.
+Set `CODEX_ENABLED=true` and rebuild the Dev Container to enable it. When enabled, wp-dev installs the pinned `CODEX_CLI_VERSION`, initializes `/home/developer/.codex`, installs the Codex hooks, and records the VS Code terminal TTY for the notification hook.
 
-When disabled, the Codex CLI and OpenAI extension are not installed automatically, and Codex-specific initialization is skipped. `CODEX_ENABLED` accepts only `true` or `false`; any other value fails clearly during image build or shell setup.
+The OpenAI / Codex VS Code extension is not installed automatically. Install it manually from VS Code if you want to use the editor extension.
+
+When disabled, the Codex CLI is not installed and Codex-specific initialization is skipped. `CODEX_ENABLED` accepts only `true` or `false`; any other value fails clearly during image build or shell setup.
 
 `CODEX_CLI_VERSION` remains pinned in the environment templates but is used only when Codex is enabled.
 
