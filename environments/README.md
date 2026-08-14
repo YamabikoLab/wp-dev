@@ -31,7 +31,8 @@ Update at least the following values for the WordPress project being developed:
 | `WP_CLI_VERSION` | WP-CLI version installed during the development image build. |
 | `WP_CLI_SHA256` | Expected SHA-256 digest for the WP-CLI PHAR matching `WP_CLI_VERSION`. |
 | `XDEBUG_VERSION` | Xdebug version installed during the development image build. |
-| `CODEX_CLI_VERSION` | Codex CLI version installed during the development image build. |
+| `CODEX_ENABLED` | Optional Codex integration. Defaults to `false`; set to `true` to install and initialize Codex. |
+| `CODEX_CLI_VERSION` | Codex CLI version used only when `CODEX_ENABLED=true`. |
 | `LOGCUT_VERSION` | logcut release version installed during the development image build. Specify the version without the `v` prefix. |
 | `WORDPRESS_HOST` | Host name used by the canonical WordPress URL. |
 | `WORDPRESS_PORT` | WordPress port used by both the host URL and the additional Apache listener inside the Dev Container. |
@@ -43,6 +44,22 @@ Update at least the following values for the WordPress project being developed:
 | `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and `/workspaces/project`. |
 
 `WORDPRESS_URL` is derived by Compose from `WORDPRESS_HOST` and `WORDPRESS_PORT`. Do not add a separate `WORDPRESS_URL` value to an environment file. The same URL is used by WordPress and exposed as `WP_BASE_URL` for Playwright. See [WordPress URL configuration](../docs/wordpress-url.md) for the networking and canonical-URL design.
+
+### Codex integration
+
+Codex support is optional and disabled by default:
+
+```dotenv
+CODEX_ENABLED=false
+```
+
+Set `CODEX_ENABLED=true` and rebuild the Dev Container to enable it. When enabled, wp-dev installs the pinned `CODEX_CLI_VERSION`, initializes `/home/developer/.codex`, installs the Codex hooks, and records the VS Code terminal TTY for the notification hook.
+
+The OpenAI / Codex VS Code extension is not installed automatically. Install it manually from VS Code if you want to use the editor extension.
+
+When disabled, the Codex CLI is not installed and Codex-specific initialization is skipped. `CODEX_ENABLED` accepts only `true` or `false`; any other value fails clearly during image build or shell setup.
+
+`CODEX_CLI_VERSION` remains pinned in the environment templates but is used only when Codex is enabled.
 
 ### WordPress locale
 

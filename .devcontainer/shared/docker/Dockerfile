@@ -3,7 +3,7 @@
 ARG COMPOSER_VERSION=2.8
 ARG WORDPRESS_IMAGE_TAG=7.0.2-php8.3-apache
 FROM composer:${COMPOSER_VERSION} AS composer-source
-FROM wordpress:${WORDPRESS_IMAGE_TAG}
+FROM wordpress:${WORDPRESS_IMAGE_TAG} AS base
 
 ARG NODE_VERSION
 ARG PLAYWRIGHT_VERSION
@@ -11,7 +11,6 @@ ARG PLAYWRIGHT_ONLY_SHELL=false
 ARG WP_CLI_VERSION
 ARG WP_CLI_SHA256
 ARG XDEBUG_VERSION
-ARG CODEX_CLI_VERSION
 ARG LOGCUT_VERSION
 ARG LOCAL_UID=1000
 ARG LOCAL_GID=1000
@@ -127,10 +126,6 @@ RUN set -eux; \
     rm -f logcut "$logcut_archive" SHA256SUMS; \
     logcut --version > /dev/null
 
-RUN --mount=type=cache,target=/root/.npm \
-    npm install --global "@openai/codex@${CODEX_CLI_VERSION}" \
-    && codex --version > /dev/null
-
 COPY --from=composer-source /usr/bin/composer /usr/local/bin/composer
 RUN composer --version > /dev/null
 
@@ -150,20 +145,14 @@ RUN groupadd --gid "${LOCAL_GID}" developer \
     && install -o developer -g developer -m 0700 -d \
         /home/developer \
         /home/developer/.vscode-server \
-        /home/developer/.codex \
         /home/developer/.config \
         /home/developer/.config/gh \
-    && install -m 0755 -d /usr/local/share/codex-hooks /usr/local/share/wp-dev/apache
+    && install -m 0755 -d /usr/local/share/wp-dev/apache
 
 COPY docker/wordpress/mu-plugins \
     /usr/src/wordpress/wp-content/mu-plugins
 COPY .devcontainer/shared/apache/wordpress-url.conf.template \
     /usr/local/share/wp-dev/apache/wordpress-url.conf.template
-
-COPY --chmod=0755 .devcontainer/shared/scripts/terminal-bell.sh \
-    /usr/local/share/codex-hooks/terminal-bell.sh
-COPY .devcontainer/shared/hooks/hooks.json \
-    /usr/local/share/codex-hooks/hooks.json
 
 COPY --chmod=0755 .devcontainer/shared/scripts/devcontainer-entrypoint.sh \
     /usr/local/bin/devcontainer-entrypoint
@@ -172,3 +161,20 @@ WORKDIR /var/www/html
 
 ENTRYPOINT ["devcontainer-entrypoint"]
 CMD ["apache2-foreground"]
+
+FROM base AS codex-false
+ENV CODEX_ENABLED=false
+
+FROM base AS codex-true
+ARG CODEX_CLI_VERSION
+ENV CODEX_ENABLED=true
+RUN test -n "${CODEX_CLI_VERSION}" || (echo 'CODEX_CLI_VERSION is required when CODEX_ENABLED=true' >&2; exit 1)
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --global "@openai/codex@${CODEX_CLI_VERSION}" \
+    && codex --version > /dev/null
+RUN install -o developer -g developer -m 0700 -d /home/developer/.codex \
+    && install -m 0755 -d /usr/local/share/codex-hooks
+COPY --chmod=0755 .devcontainer/shared/scripts/terminal-bell.sh \
+    /usr/local/share/codex-hooks/terminal-bell.sh
+COPY .devcontainer/shared/hooks/hooks.json \
+    /usr/local/share/codex-hooks/hooks.json

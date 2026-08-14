@@ -11,8 +11,19 @@ OLD_SOURCE_LINE="source ${SCRIPT_DIR}/${LEGACY_BASHRC_BASENAME}"
 CODEX_HOME="${CODEX_HOME:-${HOME}/.codex}"
 GH_CONFIG_DIR="${GH_CONFIG_DIR:-${HOME}/.config/gh}"
 
-install -d -m 0700 "${CODEX_HOME}" "${GH_CONFIG_DIR}"
-install -m 0600 /usr/local/share/codex-hooks/hooks.json "${CODEX_HOME}/hooks.json"
+case "${CODEX_ENABLED-false}" in
+    true)
+        install -d -m 0700 "${CODEX_HOME}" "${GH_CONFIG_DIR}"
+        install -m 0600 /usr/local/share/codex-hooks/hooks.json "${CODEX_HOME}/hooks.json"
+        ;;
+    false)
+        install -d -m 0700 "${GH_CONFIG_DIR}"
+        ;;
+    *)
+        printf 'CODEX_ENABLED must be true or false: %s\n' "${CODEX_ENABLED}" >&2
+        exit 1
+        ;;
+esac
 
 touch "${BASHRC_FILE}"
 
