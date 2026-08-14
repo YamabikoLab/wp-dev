@@ -91,7 +91,9 @@ Codexはオプション機能で、既定では無効です。利用する場合
 CODEX_ENABLED=true
 ```
 
-有効時のみCodex CLI、Codex hooks、TTY記録、OpenAIのVS Code拡張が導入・初期化されます。`CODEX_ENABLED`は`true`または`false`のみ指定できます。Codex CLIのバージョンは`CODEX_CLI_VERSION`で固定します。
+有効時のみCodex CLI、Codex hooks、TTY記録が導入・初期化されます。`CODEX_ENABLED`は`true`または`false`のみ指定できます。Codex CLIのバージョンは`CODEX_CLI_VERSION`で固定します。
+
+OpenAI / Codex 用の VS Code 拡張は自動導入しません。エディター拡張を利用する場合は、VS Code から手動でインストールしてください。
 
 `WORDPRESS_URL`は`WORDPRESS_HOST`と`WORDPRESS_PORT`からDocker Composeが導出します。環境設定ファイルへ個別に設定しないでください。
 
