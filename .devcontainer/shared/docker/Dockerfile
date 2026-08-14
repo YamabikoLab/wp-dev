@@ -106,4 +106,3 @@ RUN install -o developer -g developer -m 0700 -d /home/developer/.codex \
     && install -m 0755 -d /usr/local/share/codex-hooks
 COPY --chmod=0755 .devcontainer/shared/scripts/terminal-bell.sh /usr/local/share/codex-hooks/terminal-bell.sh
 COPY .devcontainer/shared/hooks/hooks.json /usr/local/share/codex-hooks/hooks.json
-LABEL devcontainer.metadata='[{"customizations":{"vscode":{"extensions":["openai.chatgpt"]}}}]'
