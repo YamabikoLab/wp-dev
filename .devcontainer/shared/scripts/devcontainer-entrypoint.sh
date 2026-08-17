@@ -7,6 +7,7 @@ APACHE_URL_CONFIG_TEMPLATE="/usr/local/share/wp-dev/apache/wordpress-url.conf.te
 APACHE_URL_CONFIG="/etc/apache2/conf-available/wp-dev-wordpress-url.conf"
 WORDPRESS_CONFIG_FILE="/var/www/html/wp-config.php"
 WORDPRESS_URL_MARKER="// wp-dev: canonical-url"
+WP_CLI_HOME="/var/www"
 
 if [[ ! "${WORDPRESS_PORT:-}" =~ ^[0-9]+$ ]] || (( WORDPRESS_PORT < 1 || WORDPRESS_PORT > 65535 )); then
     printf 'Invalid WORDPRESS_PORT: %s\n' "${WORDPRESS_PORT:-}" >&2
@@ -82,7 +83,8 @@ fi
 : "${WORDPRESS_ADMIN_PASSWORD:?WORDPRESS_ADMIN_PASSWORD is required}"
 : "${WORDPRESS_ADMIN_EMAIL:?WORDPRESS_ADMIN_EMAIL is required}"
 
-wp_cli=(wp --allow-root --path=/var/www/html)
+install -o www-data -g www-data -m 0755 -d "${WP_CLI_HOME}/.wp-cli/cache"
+wp_cli=(runuser -u www-data -- env HOME="${WP_CLI_HOME}" wp --path=/var/www/html)
 
 if ! "${wp_cli[@]}" core is-installed >/dev/null 2>&1; then
     "${wp_cli[@]}" core install \
@@ -140,6 +142,7 @@ case "${MCP_ADAPTER_ENABLED:-false}" in
                     "https://github.com/WordPress/mcp-adapter/releases/download/v${MCP_ADAPTER_VERSION}/mcp-adapter.zip" \
                     -o "${mcp_adapter_zip}"
                 printf '%s  %s\n' "${MCP_ADAPTER_SHA256}" "${mcp_adapter_zip}" | sha256sum -c -
+                chown www-data:www-data "${mcp_adapter_zip}"
                 "${wp_cli[@]}" plugin install "${mcp_adapter_zip}" --force
 
                 rm -f "${mcp_adapter_zip}"
