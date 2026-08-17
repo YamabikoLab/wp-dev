@@ -142,6 +142,7 @@ case "${MCP_ADAPTER_ENABLED:-false}" in
                     "https://github.com/WordPress/mcp-adapter/releases/download/v${MCP_ADAPTER_VERSION}/mcp-adapter.zip" \
                     -o "${mcp_adapter_zip}"
                 printf '%s  %s\n' "${MCP_ADAPTER_SHA256}" "${mcp_adapter_zip}" | sha256sum -c -
+                chown www-data:www-data "${mcp_adapter_zip}"
                 "${wp_cli[@]}" plugin install "${mcp_adapter_zip}" --force
 
                 rm -f "${mcp_adapter_zip}"
