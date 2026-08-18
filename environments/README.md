@@ -97,7 +97,7 @@ When the environment is switched back to `EDITOR_MODE=default`, the same marker 
 
 This compatibility switch applies to the post editor only. WordPress is moving toward always using the iframe editor, so `non-iframe` is intended only for testing versions that still provide the fallback.
 
-Composer is copied from the `composer:${COMPOSER_VERSION}` image into the WordPress development image. Use a valid Composer image tag, such as `2.8`, and rebuild the image after changing it.
+Composer is copied from the `composer:${COMPOSER_VERSION}` image into the WordPress development image. Use a valid Composer image tag, such as `2.10`, and rebuild the image after changing it.
 
 During the image build, the WP-CLI PHAR is checked against `WP_CLI_SHA256` before it is made executable. When `WP_CLI_VERSION` is updated, update `WP_CLI_SHA256` to the digest published for the matching release asset.
 
