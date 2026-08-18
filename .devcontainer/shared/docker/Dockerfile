@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
-ARG COMPOSER_VERSION=2.8
-ARG WORDPRESS_IMAGE_TAG=7.0.2-php8.3-apache
+ARG COMPOSER_VERSION
+ARG WORDPRESS_IMAGE_TAG
 FROM composer:${COMPOSER_VERSION} AS composer-source
 FROM wordpress:${WORDPRESS_IMAGE_TAG} AS base
 
