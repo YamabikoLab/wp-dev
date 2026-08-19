@@ -22,6 +22,7 @@ Update at least the following values for the WordPress project being developed:
 
 | Variable | Purpose |
 | --- | --- |
+| `ENVIRONMENT_NAME` | Canonical environment identifier. It is passed into the Dev Container and used to isolate environment-specific E2E storage state. |
 | `COMPOSE_PROJECT_NAME` | Unique Docker Compose project name used to isolate containers, networks, and volumes. |
 | `COMPOSER_VERSION` | Composer image tag used to provide the Composer executable during the development image build. |
 | `WORDPRESS_IMAGE_TAG` | WordPress image tag used to build the development container. |
@@ -44,6 +45,8 @@ Update at least the following values for the WordPress project being developed:
 | `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and `/workspaces/project`. |
 
 `WORDPRESS_URL` is derived by Compose from `WORDPRESS_HOST` and `WORDPRESS_PORT`. Do not add a separate `WORDPRESS_URL` value to an environment file. The same URL is used by WordPress and exposed as `WP_BASE_URL` for Playwright. See [WordPress URL configuration](../docs/wordpress-url.md) for the networking and canonical-URL design.
+
+`STORAGE_STATE_PATH` is also derived by Compose from `ENVIRONMENT_NAME` and passed into the Dev Container. E2E utilities that honor this variable therefore store authentication state separately for each environment, for example `artifacts/storage-states/default/admin.json` and `artifacts/storage-states/wp683/admin.json`. Do not add a separate `STORAGE_STATE_PATH` value to an environment file.
 
 ### Codex integration
 
