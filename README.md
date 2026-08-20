@@ -41,9 +41,13 @@ projects/
 ```bash
 cd wp-dev
 cp environments/default.env.example environments/default.env
+# WordPress 7.0.4を使用する場合
+cp environments/wp704.env.example environments/wp704.env
 # WordPress 6.8.3を使用する場合
 cp environments/wp683.env.example environments/wp683.env
 ```
+
+`default` は現在の標準開発環境で、WordPress 7.1.0を使用します。`wp704` と `wp683` は過去バージョンを固定して互換性確認に使用する環境です。
 
 作成した環境設定ファイルを開き、開発対象に合わせて次の項目を変更します。
 
@@ -111,14 +115,15 @@ Dev Containers: Reopen in Container
 
 複数のDev Container構成が表示された場合は、次のいずれかを選択します。
 
-- `default`: `environments/default.env`を使用
-- `wp683`: `environments/wp683.env`を使用
+- `default`: WordPress 7.1.0。`environments/default.env`を使用する現在の標準環境
+- `wp704`: WordPress 7.0.4。`environments/wp704.env`を使用する固定互換性確認環境
+- `wp683`: WordPress 6.8.3。`environments/wp683.env`を使用する固定互換性確認環境
 
 Dev Containerは`developer`ユーザーで開き、開発対象のリポジトリが`/workspaces/project`として直接表示されます。`developer`のUID/GIDは環境設定の`LOCAL_UID` / `LOCAL_GID`を使用します。
 
 WordPress、Apache、PHPはベースイメージ標準の`www-data`で実行し、`www-data`のUID/GIDは`LOCAL_UID` / `LOCAL_GID`へ変更しません。
 
-`wp683`のサンプル設定ではWordPressを`http://127.0.0.1:8081`、Mailpitを`http://127.0.0.1:8026`で公開します。
+サンプル設定では、`default` はWordPressを`http://127.0.0.1:8080`、Mailpitを`http://127.0.0.1:8025`で公開します。`wp704` は`8082` / `8027`、`wp683` は`8081` / `8026`を使用するため、各環境を独立して起動できます。
 
 コンテナの作成時に、`wp-dev`内の初期化スクリプトが自動的に実行されます。
 
@@ -165,6 +170,7 @@ Codex有効時は`codex`コマンドで起動できます。
 
 ```bash
 docker compose --env-file environments/default.env -f .devcontainer/default/compose.yaml config --quiet
+docker compose --env-file environments/wp704.env -f .devcontainer/wp704/compose.yaml config --quiet
 docker compose --env-file environments/wp683.env -f .devcontainer/wp683/compose.yaml config --quiet
 ```
 
@@ -182,7 +188,7 @@ Codexを有効にした場合は、次も確認できます。
 codex --version
 ```
 
-`wp683`のコンテナ内では、次のコマンドでバージョンを確認できます。
+各環境のコンテナ内では、次のコマンドで実際のWordPressとPHPのバージョンを確認できます。
 
 ```bash
 wp core version
@@ -246,6 +252,15 @@ docker compose \
   down
 ```
 
+`wp704`を停止する場合は、次を実行します。
+
+```bash
+docker compose \
+  --env-file environments/wp704.env \
+  -f .devcontainer/wp704/compose.yaml \
+  down
+```
+
 `wp683`を停止する場合は、次を実行します。
 
 ```bash
@@ -277,7 +292,7 @@ docker compose \
   down --volumes
 ```
 
-`wp683`では`environments/wp683.env`と`.devcontainer/wp683/compose.yaml`を使用してください。
+`wp704`では`environments/wp704.env`と`.devcontainer/wp704/compose.yaml`、`wp683`では`environments/wp683.env`と`.devcontainer/wp683/compose.yaml`を使用してください。
 
 完全初期化では対象Composeプロジェクトの`wordpress_data`と`db_data`が削除されます。`WP_PROJECT_SOURCE_PATH`で指定したホスト側のbind mount元は削除されません。また、バックアップやホストへ別途コピーしたデータは残る可能性があります。
 

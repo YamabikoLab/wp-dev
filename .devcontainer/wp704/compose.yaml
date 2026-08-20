@@ -1,0 +1,3 @@
+include:
+  - path: ../../docker/compose.shared.yaml
+    env_file: ../../environments/wp704.env

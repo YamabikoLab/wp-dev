@@ -50,14 +50,14 @@ WordPress 通常リクエストでは `WP_DEBUG_DISPLAY=false` を維持しま�
 
 wp-dev は `WORDPRESS_IMAGE_TAG` で選択した Docker image 内の WordPress Core を正として扱います。起動時に image 側の `/usr/src/wordpress` と `wordpress_data` volume 側の `/var/www/html` のバージョンを比較し、一致しない場合は起動を失敗させます。
 
-例えば、既存 volume の WordPress Core が自動更新などによって image より新しくなっている場合は、次のようなエラーになります。
+例えば、`default` を WordPress 7.1.0 に更新した後も既存 volume に WordPress 7.0.4 が残っている場合は、次のようなエラーになります。
 
 ```text
-Expected WordPress 7.0.4, but the current WordPress volume contains 7.1.
+Expected WordPress 7.1.0, but the current WordPress volume contains 7.0.4.
 Recreate the WordPress volume before continuing.
 ```
 
-Core の自動更新は wp-dev 側で無効化されますが、すでに更新済みの `wordpress_data` volume は自動的に元のバージョンへ戻りません。その場合は、対象 Compose プロジェクトを確認したうえで、後述の「完全初期化」を実行してください。
+Core の自動更新は wp-dev 側で無効化されますが、選択した image と異なる Core が残っている `wordpress_data` volume は自動的に置き換えられません。その場合は、対象 Compose プロジェクトを確認したうえで、後述の「完全初期化」を実行してください。
 
 `down --volumes` は WordPress 本体だけでなく MariaDB の `db_data` も削除します。必要な開発データがある場合は、実行前に退避してください。
 
@@ -96,7 +96,7 @@ docker compose \
   down --volumes
 ```
 
-`wp683` では `environments/wp683.env` と `.devcontainer/wp683/compose.yaml` を使用してください。
+`wp704` では `environments/wp704.env` と `.devcontainer/wp704/compose.yaml`、`wp683` では `environments/wp683.env` と `.devcontainer/wp683/compose.yaml` を使用してください。
 
 ## Mailpit の削除・初期化
 
@@ -106,13 +106,14 @@ wp-dev の Mailpit サービスには `MP_DATABASE` や永続 Volumeを設定し
 
 環境単位で初期化する場合は、対象 Compose プロジェクトの Mailpit コンテナを削除・再作成します。通常の `docker compose down` でも Mailpit コンテナが削除されるため、再作成後に旧メールが残らない構成です。
 
-実環境での検証では、`default` と `wp683` の双方でメールを投入した後に停止・再作成し、旧メールが残っていないことを確認してください。
+実環境での検証では、`default`、`wp704`、`wp683` の各環境でメールを投入した後に停止・再作成し、旧メールが残っていないことを確認してください。
 
 ## 構成検証
 
-変更後は両環境の Compose 構成を確認します。
+変更後は各環境の Compose 構成を確認します。
 
 ```bash
 docker compose --env-file environments/default.env -f .devcontainer/default/compose.yaml config --quiet
+docker compose --env-file environments/wp704.env -f .devcontainer/wp704/compose.yaml config --quiet
 docker compose --env-file environments/wp683.env -f .devcontainer/wp683/compose.yaml config --quiet
 ```
