@@ -55,6 +55,11 @@ services:
         define('WP_DEBUG_DISPLAY', false);
         define('SCRIPT_DEBUG', true);
 
+        // wp-dev: core-auto-update
+        if (!defined('WP_AUTO_UPDATE_CORE')) {
+            define('WP_AUTO_UPDATE_CORE', false);
+        }
+
         // wp-dev: canonical-url
         if (!defined('WP_HOME')) {
             define('WP_HOME', getenv('WORDPRESS_URL'));
