@@ -6,7 +6,7 @@ MCP Adapter is disabled by default. `wp-dev` installs it only when the environme
 
 ## Enable MCP Adapter
 
-The `default` environment uses WordPress 7.0.4 and can enable MCP Adapter. In `environments/default.env`, set:
+The `default` environment uses WordPress 7.1.0 and can enable MCP Adapter. In `environments/default.env`, set:
 
 ```dotenv
 MCP_ADAPTER_ENABLED=true
@@ -24,7 +24,8 @@ At startup, `wp-dev` downloads the matching official GitHub Release ZIP, verifie
 
 MCP Adapter itself supports WordPress 6.8 when the separate Abilities API dependency is installed. `wp-dev` intentionally limits this optional integration to WordPress 6.9 or later, where the Abilities API is included in WordPress core.
 
-- `default` currently uses WordPress 7.0.4 and supports this integration.
+- `default` currently uses WordPress 7.1.0 and supports this integration.
+- `wp704` uses WordPress 7.0.4 and supports this integration.
 - `wp683` uses WordPress 6.8.3 and does not install MCP Adapter, even if `MCP_ADAPTER_ENABLED=true` is set accidentally. Startup prints a skip message instead.
 
 The `wp683` example therefore keeps `MCP_ADAPTER_ENABLED=false`.
