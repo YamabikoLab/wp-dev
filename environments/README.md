@@ -4,10 +4,13 @@ This directory contains the project-specific values used by each Dev Container c
 
 Each Dev Container loads its matching local environment file:
 
-- `default` loads `environments/default.env`.
-- `wp683` loads `environments/wp683.env`.
+- `default` loads `environments/default.env` and represents the current standard WordPress development environment.
+- `wp704` loads `environments/wp704.env` as the fixed WordPress 7.0.4 compatibility environment.
+- `wp683` loads `environments/wp683.env` as the fixed WordPress 6.8.3 compatibility environment.
 
 The repository tracks matching `.env.example` templates, while local `.env` files must not be committed.
+
+When the standard WordPress version changes, `default` should move to that version. Keep an older version as a `wp***` environment only when a fixed compatibility environment is useful.
 
 ## Create a local environment file
 
@@ -15,6 +18,7 @@ Copy the template for the environment you want to use:
 
 ```bash
 cp environments/default.env.example environments/default.env
+cp environments/wp704.env.example environments/wp704.env
 cp environments/wp683.env.example environments/wp683.env
 ```
 
@@ -46,7 +50,7 @@ Update at least the following values for the WordPress project being developed:
 
 `WORDPRESS_URL` is derived by Compose from `WORDPRESS_HOST` and `WORDPRESS_PORT`. Do not add a separate `WORDPRESS_URL` value to an environment file. The same URL is used by WordPress and exposed as `WP_BASE_URL` for Playwright. See [WordPress URL configuration](../docs/wordpress-url.md) for the networking and canonical-URL design.
 
-`STORAGE_STATE_PATH` is also derived by Compose from `ENVIRONMENT_NAME` and passed into the Dev Container. E2E utilities that honor this variable therefore store authentication state separately for each environment, for example `artifacts/storage-states/default/admin.json` and `artifacts/storage-states/wp683/admin.json`. Do not add a separate `STORAGE_STATE_PATH` value to an environment file.
+`STORAGE_STATE_PATH` is also derived by Compose from `ENVIRONMENT_NAME` and passed into the Dev Container. E2E utilities that honor this variable therefore store authentication state separately for each environment, for example `artifacts/storage-states/default/admin.json`, `artifacts/storage-states/wp704/admin.json`, and `artifacts/storage-states/wp683/admin.json`. Do not add a separate `STORAGE_STATE_PATH` value to an environment file.
 
 ### Codex integration
 
@@ -120,6 +124,7 @@ Future WordPress environments should follow the same naming pair: `wp***.env.exa
 
 ```bash
 docker compose --env-file environments/default.env -f .devcontainer/default/compose.yaml config
+docker compose --env-file environments/wp704.env -f .devcontainer/wp704/compose.yaml config
 docker compose --env-file environments/wp683.env -f .devcontainer/wp683/compose.yaml config
 ```
 
