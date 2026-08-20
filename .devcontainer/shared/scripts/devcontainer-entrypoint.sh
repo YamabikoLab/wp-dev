@@ -44,8 +44,7 @@ install -o www-data -g www-data -m 0644 \
     "${MU_PLUGIN_SOURCE}" \
     "${MU_PLUGIN_TARGET_DIR}/development.php"
 
-if [[ -f "${WORDPRESS_CONFIG_FILE}" ]] \
-    && ! grep -Fq "${WORDPRESS_CORE_UPDATE_MARKER}" "${WORDPRESS_CONFIG_FILE}"; then
+if [[ -f "${WORDPRESS_CONFIG_FILE}" ]]; then
     php -r '
         $path = $argv[1];
         $contents = file_get_contents($path);
@@ -54,8 +53,16 @@ if [[ -f "${WORDPRESS_CONFIG_FILE}" ]] \
             exit(1);
         }
 
-        $needle = "require_once ABSPATH . '\''wp-settings.php'\'';";
-        $block = <<<'\''PHP'\''
+        $pattern = "~define\s*\(\s*([\"\x27])WP_AUTO_UPDATE_CORE\\1\s*,.*?\)\s*;~is";
+        $updated = preg_replace($pattern, "define('\''WP_AUTO_UPDATE_CORE'\'', false);", $contents);
+        if ($updated === null) {
+            fwrite(STDERR, "Failed to normalize WP_AUTO_UPDATE_CORE in wp-config.php\n");
+            exit(1);
+        }
+
+        if (strpos($updated, "// wp-dev: core-auto-update") === false) {
+            $needle = "require_once ABSPATH . '\''wp-settings.php'\'';";
+            $block = <<<'\''PHP'\''
 // wp-dev: core-auto-update
 if (!defined('\''WP_AUTO_UPDATE_CORE'\'')) {
     define('\''WP_AUTO_UPDATE_CORE'\'', false);
@@ -63,13 +70,15 @@ if (!defined('\''WP_AUTO_UPDATE_CORE'\'')) {
 
 PHP;
 
-        $count = 0;
-        $updated = str_replace($needle, $block . $needle, $contents, $count);
-        if ($count !== 1) {
-            fwrite(STDERR, "Could not locate wp-settings.php bootstrap in wp-config.php\n");
-            exit(1);
+            $count = 0;
+            $updated = str_replace($needle, $block . $needle, $updated, $count);
+            if ($count !== 1) {
+                fwrite(STDERR, "Could not locate wp-settings.php bootstrap in wp-config.php\n");
+                exit(1);
+            }
         }
-        if (file_put_contents($path, $updated) === false) {
+
+        if ($updated !== $contents && file_put_contents($path, $updated) === false) {
             fwrite(STDERR, "Failed to update wp-config.php\n");
             exit(1);
         }
