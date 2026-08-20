@@ -2,7 +2,7 @@
 
 `wp-dev` では、ホストのブラウザと Dev Container 内の Playwright から、同じ WordPress URL を使用します。
 
-`default` は `http://127.0.0.1:8080`、`wp683` は `http://127.0.0.1:8081` を使用します。
+`default` は `http://127.0.0.1:8080`、`wp704` は `http://127.0.0.1:8082`、`wp683` は `http://127.0.0.1:8081` を使用します。
 
 ## 問題
 
