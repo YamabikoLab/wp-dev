@@ -45,6 +45,7 @@ body:
       description: 使用している環境を選択してください。
       options:
         - default
+        - wp704
         - wp683
         - その他
     validations:
