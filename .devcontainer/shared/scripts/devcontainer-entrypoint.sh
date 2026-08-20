@@ -6,7 +6,10 @@ MU_PLUGIN_TARGET_DIR="/var/www/html/wp-content/mu-plugins"
 APACHE_URL_CONFIG_TEMPLATE="/usr/local/share/wp-dev/apache/wordpress-url.conf.template"
 APACHE_URL_CONFIG="/etc/apache2/conf-available/wp-dev-wordpress-url.conf"
 WORDPRESS_CONFIG_FILE="/var/www/html/wp-config.php"
+WORDPRESS_SOURCE_VERSION_FILE="/usr/src/wordpress/wp-includes/version.php"
+WORDPRESS_RUNTIME_VERSION_FILE="/var/www/html/wp-includes/version.php"
 WORDPRESS_URL_MARKER="// wp-dev: canonical-url"
+WORDPRESS_CORE_UPDATE_MARKER="// wp-dev: core-auto-update"
 WP_CLI_HOME="/var/www"
 
 if [[ ! "${WORDPRESS_PORT:-}" =~ ^[0-9]+$ ]] || (( WORDPRESS_PORT < 1 || WORDPRESS_PORT > 65535 )); then
@@ -41,6 +44,47 @@ install -o www-data -g www-data -m 0644 \
     "${MU_PLUGIN_SOURCE}" \
     "${MU_PLUGIN_TARGET_DIR}/development.php"
 
+if [[ -f "${WORDPRESS_CONFIG_FILE}" ]]; then
+    php -r '
+        $path = $argv[1];
+        $contents = file_get_contents($path);
+        if ($contents === false) {
+            fwrite(STDERR, "Failed to read wp-config.php\n");
+            exit(1);
+        }
+
+        $pattern = "~define\s*\(\s*([\"\x27])WP_AUTO_UPDATE_CORE\\1\s*,.*?\)\s*;~is";
+        $updated = preg_replace($pattern, "define('\''WP_AUTO_UPDATE_CORE'\'', false);", $contents);
+        if ($updated === null) {
+            fwrite(STDERR, "Failed to normalize WP_AUTO_UPDATE_CORE in wp-config.php\n");
+            exit(1);
+        }
+
+        if (strpos($updated, "// wp-dev: core-auto-update") === false) {
+            $needle = "require_once ABSPATH . '\''wp-settings.php'\'';";
+            $block = <<<'\''PHP'\''
+// wp-dev: core-auto-update
+if (!defined('\''WP_AUTO_UPDATE_CORE'\'')) {
+    define('\''WP_AUTO_UPDATE_CORE'\'', false);
+}
+
+PHP;
+
+            $count = 0;
+            $updated = str_replace($needle, $block . $needle, $updated, $count);
+            if ($count !== 1) {
+                fwrite(STDERR, "Could not locate wp-settings.php bootstrap in wp-config.php\n");
+                exit(1);
+            }
+        }
+
+        if ($updated !== $contents && file_put_contents($path, $updated) === false) {
+            fwrite(STDERR, "Failed to update wp-config.php\n");
+            exit(1);
+        }
+    ' "${WORDPRESS_CONFIG_FILE}"
+fi
+
 if [[ -f "${WORDPRESS_CONFIG_FILE}" ]] \
     && ! grep -Fq "${WORDPRESS_URL_MARKER}" "${WORDPRESS_CONFIG_FILE}"; then
     php -r '
@@ -74,6 +118,29 @@ PHP;
             exit(1);
         }
     ' "${WORDPRESS_CONFIG_FILE}"
+fi
+
+read_wordpress_version() {
+    php -r '
+        $wp_version = null;
+        require $argv[1];
+        if (!is_string($wp_version) || $wp_version === "") {
+            fwrite(STDERR, "Could not determine WordPress version from " . $argv[1] . "\n");
+            exit(1);
+        }
+        echo $wp_version;
+    ' "$1"
+}
+
+expected_wordpress_version="$(read_wordpress_version "${WORDPRESS_SOURCE_VERSION_FILE}")"
+runtime_wordpress_version="$(read_wordpress_version "${WORDPRESS_RUNTIME_VERSION_FILE}")"
+
+if [[ "${expected_wordpress_version}" != "${runtime_wordpress_version}" ]]; then
+    printf 'Expected WordPress %s, but the current WordPress volume contains %s.\n' \
+        "${expected_wordpress_version}" \
+        "${runtime_wordpress_version}" >&2
+    printf 'Recreate the WordPress volume before continuing.\n' >&2
+    exit 1
 fi
 
 : "${WORDPRESS_URL:?WORDPRESS_URL is required}"
