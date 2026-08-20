@@ -46,6 +46,21 @@ WordPress 通常リクエストでは `WP_DEBUG_DISPLAY=false` を維持しま�
 
 `WP_PROJECT_SOURCE_PATH` はホスト上の外部プロジェクトを bind mount するため、`down --volumes` では削除されません。ホストへ別途コピーしたバックアップやエクスポートも削除されません。
 
+## WordPress Core バージョンの不一致
+
+wp-dev は `WORDPRESS_IMAGE_TAG` で選択した Docker image 内の WordPress Core を正として扱います。起動時に image 側の `/usr/src/wordpress` と `wordpress_data` volume 側の `/var/www/html` のバージョンを比較し、一致しない場合は起動を失敗させます。
+
+例えば、既存 volume の WordPress Core が自動更新などによって image より新しくなっている場合は、次のようなエラーになります。
+
+```text
+Expected WordPress 7.0.4, but the current WordPress volume contains 7.1.
+Recreate the WordPress volume before continuing.
+```
+
+Core の自動更新は wp-dev 側で無効化されますが、すでに更新済みの `wordpress_data` volume は自動的に元のバージョンへ戻りません。その場合は、対象 Compose プロジェクトを確認したうえで、後述の「完全初期化」を実行してください。
+
+`down --volumes` は WordPress 本体だけでなく MariaDB の `db_data` も削除します。必要な開発データがある場合は、実行前に退避してください。
+
 ## 通常停止と完全初期化
 
 ### 通常停止
