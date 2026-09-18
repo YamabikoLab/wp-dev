@@ -135,10 +135,20 @@ read_wordpress_version() {
         $wp_version = null;
         require $argv[1];
         if (!is_string($wp_version) || $wp_version === "") {
-            fwrite(STDERR, "Could not determine WordPress version from " . $argv[1] . "\n");
+            fwrite(STDERR, "Could not determine WordPress version from " . $argv[1] . "\\n");
             exit(1);
         }
         echo $wp_version;
+    ' "$1"
+}
+
+wordpress_major_minor() {
+    php -r '
+        if (!preg_match("/^([0-9]+)\\.([0-9]+)/", $argv[1], $matches)) {
+            fwrite(STDERR, "Could not determine WordPress major/minor from " . $argv[1] . "\\n");
+            exit(1);
+        }
+        echo $matches[1] . "." . $matches[2];
     ' "$1"
 }
 
@@ -149,8 +159,23 @@ if [[ "${expected_wordpress_version}" != "${runtime_wordpress_version}" ]]; then
     printf 'Expected WordPress %s, but the current WordPress volume contains %s.\n' \
         "${expected_wordpress_version}" \
         "${runtime_wordpress_version}" >&2
-    printf 'Recreate the WordPress volume before continuing.\n' >&2
-    exit 1
+
+    if [[ "${WORDPRESS_VERSION_CHECK:-strict}" == "strict" ]]; then
+        printf 'Recreate the WordPress volume before continuing.\n' >&2
+        exit 1
+    fi
+
+    expected_major_minor="$(wordpress_major_minor "${expected_wordpress_version}")"
+    runtime_major_minor="$(wordpress_major_minor "${runtime_wordpress_version}")"
+
+    if [[ "${expected_major_minor}" != "${runtime_major_minor}" ]]; then
+        printf 'WORDPRESS_VERSION_CHECK=warn only allows patch-version differences within the same major/minor series.\n' >&2
+        printf 'Recreate the WordPress volume before continuing.\n' >&2
+        exit 1
+    fi
+
+    printf 'Continuing because WORDPRESS_VERSION_CHECK=warn and both versions are in the %s series.\n' \
+        "${expected_major_minor}" >&2
 fi
 
 : "${WORDPRESS_URL:?WORDPRESS_URL is required}"
