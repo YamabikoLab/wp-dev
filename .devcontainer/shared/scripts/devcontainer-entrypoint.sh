@@ -135,7 +135,7 @@ read_wordpress_version() {
         $wp_version = null;
         require $argv[1];
         if (!is_string($wp_version) || $wp_version === "") {
-            fwrite(STDERR, "Could not determine WordPress version from " . $argv[1] . "\\n");
+            fwrite(STDERR, "Could not determine WordPress version from " . $argv[1] . "\n");
             exit(1);
         }
         echo $wp_version;
@@ -145,7 +145,7 @@ read_wordpress_version() {
 wordpress_major_minor() {
     php -r '
         if (!preg_match("/^([0-9]+)\\.([0-9]+)/", $argv[1], $matches)) {
-            fwrite(STDERR, "Could not determine WordPress major/minor from " . $argv[1] . "\\n");
+            fwrite(STDERR, "Could not determine WordPress major/minor from " . $argv[1] . "\n");
             exit(1);
         }
         echo $matches[1] . "." . $matches[2];
