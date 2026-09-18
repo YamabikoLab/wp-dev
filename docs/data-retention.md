@@ -48,16 +48,35 @@ WordPress 通常リクエストでは `WP_DEBUG_DISPLAY=false` を維持しま�
 
 ## WordPress Core バージョンの不一致
 
-wp-dev は `WORDPRESS_IMAGE_TAG` で選択した Docker image 内の WordPress Core を正として扱います。起動時に image 側の `/usr/src/wordpress` と `wordpress_data` volume 側の `/var/www/html` のバージョンを比較し、一致しない場合は起動を失敗させます。
+wp-dev は `WORDPRESS_IMAGE_TAG` で選択した Docker image 内の WordPress Core を基準として、起動時に image 側の `/usr/src/wordpress` と `wordpress_data` volume 側の `/var/www/html` のバージョンを比較します。
 
-例えば、`default` を WordPress 7.1.0 に更新した後も既存 volume に WordPress 7.0.4 が残っている場合は、次のようなエラーになります。
+不一致時の挙動は `WORDPRESS_VERSION_CHECK` で選択します。
+
+- `strict`: 完全一致を要求する。未設定時の既定値で、固定バージョン検証環境ではこのモードを使用する。
+- `warn`: 同一 major/minor 系列のパッチ差分だけを許容する。例えば 7.1.0 と 7.1.1 は警告を出して起動を継続する。
+- major/minor が異なる場合は `warn` でも起動を拒否する。例えば 7.1.x と 7.2.x、6.8.x と 7.1.x は許容しない。
+- `strict` / `warn` 以外の値は、バージョンが一致している場合でも設定エラーとして起動を拒否する。
+
+`default` テンプレートは、最新パッチへ追随した既存 volume を保持できるよう `WORDPRESS_VERSION_CHECK=warn` を明示します。`wp704` / `wp683` など固定互換性確認環境は `strict` を明示します。
+
+例えば、image が WordPress 7.1.0、既存 volume が WordPress 7.1.1 の場合、`warn` では次のように警告して起動を継続します。
+
+```text
+Expected WordPress 7.1.0, but the current WordPress volume contains 7.1.1.
+Continuing because WORDPRESS_VERSION_CHECK=warn and both versions are in the 7.1 series.
+```
+
+一方、image が WordPress 7.1.0、既存 volume が WordPress 7.0.4 の場合は `warn` でも起動を拒否します。
 
 ```text
 Expected WordPress 7.1.0, but the current WordPress volume contains 7.0.4.
+WORDPRESS_VERSION_CHECK=warn only allows patch-version differences within the same major/minor series.
 Recreate the WordPress volume before continuing.
 ```
 
-Core の自動更新は wp-dev 側で無効化されますが、選択した image と異なる Core が残っている `wordpress_data` volume は自動的に置き換えられません。その場合は、対象 Compose プロジェクトを確認したうえで、後述の「完全初期化」を実行してください。
+Core の自動更新は wp-dev 側で無効化されますが、手動更新などにより選択した image と異なる Core が `wordpress_data` volume に残ることがあります。`warn` は差異を認識したうえで同一系列のパッチ差分を許容するモードであり、volume 内の Core を image に合わせて自動置換する機能ではありません。
+
+major/minor が異なる場合や `strict` で不一致となる場合は、対象 Compose プロジェクトを確認したうえで、後述の「完全初期化」を実行してください。
 
 `down --volumes` は WordPress 本体だけでなく MariaDB の `db_data` も削除します。必要な開発データがある場合は、実行前に退避してください。
 

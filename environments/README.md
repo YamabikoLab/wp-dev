@@ -42,6 +42,7 @@ Update at least the following values for the WordPress project being developed:
 | `WORDPRESS_HOST` | Host name used by the canonical WordPress URL. |
 | `WORDPRESS_PORT` | WordPress port used by both the host URL and the additional Apache listener inside the Dev Container. |
 | `WORDPRESS_LOCALE` | WordPress locale used only when WordPress is installed for the first time. Defaults to `ja`. |
+| `WORDPRESS_VERSION_CHECK` | WordPress Core version mismatch policy. Use `strict` for exact matching or `warn` to allow patch differences only within the same major/minor series. Compose defaults to `strict`. |
 | `EDITOR_MODE` | Post editor mode for compatibility testing. Use `default` normally or `non-iframe` to force the legacy non-iframe post editor where the selected WordPress version still supports it. |
 | `PHP_DISPLAY_ERRORS` | PHP error display for pre-WordPress/direct PHP diagnostics. Keep `Off` normally; temporarily set `On` only when required. WordPress requests still keep `WP_DEBUG_DISPLAY=false`. |
 | `WP_PROJECT_DIRECTORY` | WordPress project type: `plugins` or `themes`. |
@@ -67,6 +68,18 @@ The OpenAI / Codex VS Code extension is not installed automatically. Install it 
 When disabled, the Codex CLI is not installed and Codex-specific initialization is skipped. `CODEX_ENABLED` accepts only `true` or `false`; any other value fails clearly during image build or shell setup.
 
 `CODEX_CLI_VERSION` remains pinned in the environment templates but is used only when Codex is enabled.
+
+### WordPress Core version check
+
+`WORDPRESS_VERSION_CHECK` controls how wp-dev handles a mismatch between the WordPress Core version bundled in the selected image and the version already stored in `wordpress_data`.
+
+`strict` requires an exact version match and is the safe default used when the variable is omitted. Fixed compatibility environments such as `wp704` and `wp683` set this mode explicitly.
+
+`warn` allows only patch-version differences within the same major/minor series, for example 7.1.0 and 7.1.1. A major/minor mismatch such as 7.1.x and 7.2.x still fails. The `default` template uses `warn` so an intentionally updated patch release can remain in the existing WordPress volume without forcing a reset.
+
+Only `strict` and `warn` are valid. Any other value fails during container startup.
+
+See [Development data retention and reset](../docs/data-retention.md) for the Core-version mismatch policy and reset guidance.
 
 ### WordPress locale
 
