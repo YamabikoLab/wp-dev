@@ -22,6 +22,16 @@ if [[ ! "${WORDPRESS_HOST:-}" =~ ^[A-Za-z0-9.-]+$ ]]; then
     exit 1
 fi
 
+case "${WORDPRESS_VERSION_CHECK:-strict}" in
+    strict|warn)
+        ;;
+    *)
+        printf 'WORDPRESS_VERSION_CHECK must be strict or warn: %s\n' \
+            "${WORDPRESS_VERSION_CHECK:-}" >&2
+        exit 1
+        ;;
+esac
+
 if [[ "${WORDPRESS_PORT}" == "80" ]]; then
     rm -f "${APACHE_URL_CONFIG}"
     a2disconf wp-dev-wordpress-url >/dev/null 2>&1 || true
