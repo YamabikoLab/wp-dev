@@ -81,6 +81,7 @@ WP_PROJECT_DIRECTORY=themes
 | `WORDPRESS_HOST`         | WordPressの正規URLに使用するホスト名                         |
 | `WORDPRESS_PORT`         | WordPressの公開ポート                                       |
 | `WORDPRESS_LOCALE`       | WordPress初回インストール時の言語。既定は`ja`               |
+| `WORDPRESS_VERSION_CHECK` | Core不一致時の扱い。`strict` または同一系列のパッチ差分のみ許容する `warn` |
 | `MAILPIT_WEB_PORT`       | MailpitのWeb UIを公開するホスト側ポート                     |
 | `PHP_DISPLAY_ERRORS`     | PHPエラー画面表示。通常は`Off`、限定的な診断時のみ`On`      |
 | `LOCAL_UID`              | Dev Containerの`developer`ユーザーに割り当てるUID           |
@@ -102,6 +103,8 @@ OpenAI / Codex 用の VS Code 拡張は自動導入しません。エディタ�
 `WORDPRESS_URL`は`WORDPRESS_HOST`と`WORDPRESS_PORT`からDocker Composeが導出します。環境設定ファイルへ個別に設定しないでください。
 
 `WORDPRESS_LOCALE`はWordPressが未インストールの場合にだけ`wp core install`へ渡されます。既定値は`ja`です。英語で新規インストールする場合は`WORDPRESS_LOCALE=en_US`を指定してください。すでにインストール済みのWordPressでは、この値を変更しても既存サイトの言語は変更されません。コンテナ / OS のロケールを設定する`LOCALE`とは別の設定です。
+
+`WORDPRESS_VERSION_CHECK`は、Docker image と既存 `wordpress_data` volume の WordPress Core バージョンが異なる場合の扱いを指定します。`strict` は完全一致を要求し、`warn` は同一 major/minor 系列のパッチ差分だけ警告付きで許容します。`default` テンプレートは `warn`、固定互換性確認環境は `strict` を使用します。詳しくは [開発データの保持と初期化](docs/data-retention.md#wordpress-core-バージョンの不一致) を参照してください。
 
 `PHP_DISPLAY_ERRORS`は既定で`Off`です。WordPress初期化前、直接実行PHP、起動時エラーの診断時だけ一時的に`On`へ変更し、対象コンテナを再作成してください。WordPress通常リクエストでは`WP_DEBUG_DISPLAY=false`を維持するため、この設定を`On`にしてもWordPress初期化後の通常ページへPHPエラーを表示する用途には使用しません。
 
