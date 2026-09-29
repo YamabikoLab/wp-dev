@@ -142,6 +142,9 @@ ENV TZ=${TZ} \
 
 RUN groupadd --gid "${LOCAL_GID}" developer \
     && useradd --uid "${LOCAL_UID}" --gid "${LOCAL_GID}" --create-home --shell /bin/bash developer \
+    && groupadd wp-dev-translations \
+    && usermod -aG wp-dev-translations developer \
+    && usermod -aG wp-dev-translations www-data \
     && install -o developer -g developer -m 0700 -d \
         /home/developer \
         /home/developer/.vscode-server \
