@@ -10,6 +10,8 @@ WORDPRESS_SOURCE_VERSION_FILE="/usr/src/wordpress/wp-includes/version.php"
 WORDPRESS_RUNTIME_VERSION_FILE="/var/www/html/wp-includes/version.php"
 WORDPRESS_URL_MARKER="// wp-dev: canonical-url"
 WORDPRESS_CORE_UPDATE_MARKER="// wp-dev: core-auto-update"
+WORDPRESS_LANGUAGES_DIR="/var/www/html/wp-content/languages"
+WORDPRESS_PLUGIN_LANGUAGES_DIR="${WORDPRESS_LANGUAGES_DIR}/plugins"
 WP_CLI_HOME="/var/www"
 
 if [[ ! "${WORDPRESS_PORT:-}" =~ ^[0-9]+$ ]] || (( WORDPRESS_PORT < 1 || WORDPRESS_PORT > 65535 )); then
@@ -45,6 +47,13 @@ fi
 install -o developer -g developer -m 0700 -d /workspaces
 
 docker-ensure-installed.sh true
+
+if [[ ! -d "${WORDPRESS_LANGUAGES_DIR}" ]]; then
+    install -o www-data -g www-data -m 0755 -d "${WORDPRESS_LANGUAGES_DIR}"
+fi
+
+install -o www-data -g wp-dev-translations -m 2775 -d \
+    "${WORDPRESS_PLUGIN_LANGUAGES_DIR}"
 
 mkdir -p \
     /var/www/html \
