@@ -169,6 +169,27 @@ CLI認証情報用のDockerボリュームは使用しません。Dev Container�
 
 Codex有効時は`codex`コマンドで起動できます。
 
+## WordPress翻訳ファイルの配置
+
+Dev Container内の`developer`ユーザーは、WordPress標準のプラグイン翻訳ディレクトリへ開発用のMO / JSONファイルを直接配置できます。
+
+```text
+/var/www/html/wp-content/languages/plugins/
+```
+
+例えば、生成した翻訳ファイルは次のように配置できます。
+
+```bash
+cp --remove-destination \
+  path/to/plugin-ja.mo \
+  path/to/plugin-ja-*.json \
+  /var/www/html/wp-content/languages/plugins/
+```
+
+同名ファイルが存在しない場合は通常の`cp`でも配置できます。同名ファイルがWordPress側ですでに作成されている場合は、既存ファイル自体のwrite権限に依存せずディレクトリのwrite権限で置き換えるため、`cp --remove-destination`を使用してください。
+
+追加のwrite権限は`wp-content/languages/plugins`だけに限定されます。WordPress / WP-CLIは従来どおり`www-data`としてこのディレクトリを利用します。
+
 ## 構成の検証
 
 ```bash
