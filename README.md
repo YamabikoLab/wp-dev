@@ -184,9 +184,15 @@ cp --remove-destination \
   path/to/plugin-ja.mo \
   path/to/plugin-ja-*.json \
   /var/www/html/wp-content/languages/plugins/
+
+chmod g+w \
+  /var/www/html/wp-content/languages/plugins/plugin-ja.mo \
+  /var/www/html/wp-content/languages/plugins/plugin-ja-*.json
 ```
 
 同名ファイルが存在しない場合は通常の`cp`でも配置できます。同名ファイルがWordPress側ですでに作成されている場合は、既存ファイル自体のwrite権限に依存せずディレクトリのwrite権限で置き換えるため、`cp --remove-destination`を使用してください。
+
+配置後は`chmod g+w`で共有グループにもwrite権限を付与してください。setgidによりgroupは`wp-dev-translations`になるため、これにより`developer`所有の開発用翻訳ファイルも`www-data`から更新できます。
 
 追加のwrite権限は`wp-content/languages/plugins`だけに限定されます。WordPress / WP-CLIは従来どおり`www-data`としてこのディレクトリを利用します。
 
