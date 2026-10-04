@@ -48,6 +48,9 @@ Update at least the following values for the WordPress project being developed:
 | `WP_PROJECT_DIRECTORY` | WordPress project type: `plugins` or `themes`. |
 | `WP_PROJECT_SLUG` | Directory name used under `wp-content/plugins` or `wp-content/themes`. |
 | `WP_PROJECT_SOURCE_PATH` | Path from this environment to the external project repository mounted into WordPress and `/workspaces/project`. |
+| `WP_EXTERNAL_DEPENDENCY_DIRECTORY` | Optional dependency type under `wp-content`: `plugins` or `themes`. |
+| `WP_EXTERNAL_DEPENDENCY_SLUG` | Directory name used for the optional dependency under the selected WordPress content directory. |
+| `WP_EXTERNAL_DEPENDENCY_SOURCE_PATH` | Path to the optional external plugin or theme mounted read-only into WordPress. Keep the placeholder defaults when no extra dependency is required. |
 
 `WORDPRESS_URL` is derived by Compose from `WORDPRESS_HOST` and `WORDPRESS_PORT`. Do not add a separate `WORDPRESS_URL` value to an environment file. The same URL is used by WordPress and exposed as `WP_BASE_URL` for Playwright. See [WordPress URL configuration](../docs/wordpress-url.md) for the networking and canonical-URL design.
 
@@ -128,6 +131,16 @@ Playwright installs Chromium and its runtime dependencies into `/ms-playwright`.
 Set `PLAYWRIGHT_VERSION` to the same version as the external project's `@playwright/test` or `playwright` dependency. When that project dependency is updated, update the environment file and rebuild the development image so `/ms-playwright` contains the matching browser executable.
 
 The Dev Container opens the external project directly at `/workspaces/project`.
+
+An optional external WordPress dependency can be mounted separately without becoming part of the editable workspace. Set all three values when it is needed:
+
+```dotenv
+WP_EXTERNAL_DEPENDENCY_DIRECTORY=themes
+WP_EXTERNAL_DEPENDENCY_SLUG=Divi
+WP_EXTERNAL_DEPENDENCY_SOURCE_PATH=../../Divi
+```
+
+The dependency is mounted read-only at `/var/www/html/wp-content/<plugins|themes>/<slug>`. The committed templates point to `.wp-external-dependency-placeholder` so existing environments remain valid when no additional plugin or theme is required.
 
 The database and WordPress administrator credentials in the templates are local-development defaults only. Replace them when necessary, and never store real credentials in the repository.
 
