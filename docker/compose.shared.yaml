@@ -80,6 +80,13 @@ services:
           create_host_path: false
 
       - type: bind
+        source: ${WP_EXTERNAL_DEPENDENCY_SOURCE_PATH:-../../.wp-external-dependency-placeholder}
+        target: /var/www/html/wp-content/${WP_EXTERNAL_DEPENDENCY_DIRECTORY:-plugins}/${WP_EXTERNAL_DEPENDENCY_SLUG:-.wp-dev-external-dependency}
+        read_only: true
+        bind:
+          create_host_path: false
+
+      - type: bind
         source: ${WP_PROJECT_SOURCE_PATH:?WP_PROJECT_SOURCE_PATH is required}
         target: /workspaces/project
         bind:
