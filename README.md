@@ -64,6 +64,16 @@ WP_PROJECT_SOURCE_PATH=../../your-wordpress-project
 WP_PROJECT_DIRECTORY=themes
 ```
 
+主開発対象とは別に追加の WordPress plugin / theme が必要な場合は、外部 dependency 用の 3 項目を設定します。例えば Divi theme を追加する場合は次のようにします。
+
+```dotenv
+WP_EXTERNAL_DEPENDENCY_DIRECTORY=themes
+WP_EXTERNAL_DEPENDENCY_SLUG=Divi
+WP_EXTERNAL_DEPENDENCY_SOURCE_PATH=../../Divi
+```
+
+追加 dependency が不要な場合は、テンプレート既定値の placeholder 設定をそのまま使用してください。
+
 主な設定項目は次のとおりです。
 
 | 項目                     | 説明                                                        |
@@ -89,6 +99,9 @@ WP_PROJECT_DIRECTORY=themes
 | `WP_PROJECT_DIRECTORY`   | `plugins`または`themes`                                     |
 | `WP_PROJECT_SLUG`        | WordPress内で使用するプラグインまたはテーマのディレクトリ名 |
 | `WP_PROJECT_SOURCE_PATH` | 開発対象リポジトリへの相対パス                              |
+| `WP_EXTERNAL_DEPENDENCY_DIRECTORY` | 追加 dependency の WordPress 種別。`plugins` または `themes` |
+| `WP_EXTERNAL_DEPENDENCY_SLUG` | 追加 dependency の WordPress 内ディレクトリ名 |
+| `WP_EXTERNAL_DEPENDENCY_SOURCE_PATH` | 追加 dependency への相対パス。不要時は placeholder を使用 |
 
 Codexはオプション機能で、既定では無効です。利用する場合は環境設定ファイルで次のように変更し、Dev Containerを再ビルドしてください。
 
@@ -235,6 +248,14 @@ php --version
 ```
 
 1つ目はWordPressから読み込むためのパス、2つ目はVisual Studio Codeで編集するための固定ワークスペースです。
+
+追加 dependency を設定した場合は、次にも読み取り専用でマウントされます。
+
+```text
+/var/www/html/wp-content/<plugins|themes>/<external-dependency-slug>
+```
+
+追加 dependency は `/workspaces` にはマウントしません。編集対象ではなく、主開発対象から参照する WordPress dependency として扱います。
 
 WordPress側のマウントは読み取り専用です。WordPress、Apache、PHPを実行する`www-data`から開発対象ソースへ書き込めません。一方、`/workspaces/project`は`developer`による編集用として読み書き可能なままです。両方とも同じホスト側ソースを参照するため、`developer`が生成したビルド成果物はWordPress側の読み取り専用マウントにもそのまま反映されます。
 
